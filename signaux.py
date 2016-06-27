@@ -1,5 +1,5 @@
 import signal
-import cmd_info
+import task_lib
 
 class siglib:
 
@@ -7,7 +7,7 @@ class siglib:
 		self.dico = signal.__dict__
 		signal.signal(signal.SIGALRM, self.sig_alarm)
 		signal.signal(signal.SIGINT, self.sig_int)
-		signal.alarm(7)
+		signal.alarm(5)
 
 	def get_signum(self, name):
 		if (name):
@@ -22,7 +22,7 @@ class siglib:
 		pass
 
 	def sig_alarm(self, signum, frame):
-		task = cmd_info.task
+		task = task_lib.task
 		if (task):
 			task.check_status()
 		signal.alarm(1)

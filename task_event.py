@@ -1,8 +1,5 @@
 import yaml
-from signaux import siglib
-from cmd_data import cmd_data
-
-signaux = siglib()
+from cmd_event import cmd_event
 
 def load_conf(file):
 	try:
@@ -21,7 +18,7 @@ def check_pid(cmd, line):
 	except Exception, e:
 		return (None)
 
-class cmd_info:
+class task_event:
 
 	def __init__(self):
 		data = load_conf("config.yaml")
@@ -29,11 +26,11 @@ class cmd_info:
 		self.cmd = {}
 		i = 1
 		for k, v in cmd.iteritems():
-			cmd_class = cmd_data(k, v)
+			cmd_class = cmd_event(k, v)
 			self.cmd[k] = cmd_class
 			while (i < cmd_class.numprocs):
 				name = k + str(i)
-				self.cmd[name] = cmd_data(name, v)
+				self.cmd[name] = cmd_event(name, v)
 				i += 1
 
 	def	autostart(self):
@@ -84,17 +81,15 @@ class cmd_info:
 					sig_num *= -1
 				cmd.finish(sig_num);
 			elif (cmd.process and cmd.stop_timer >= 0):
-				print ("timer", cmd.stop_timer)
 				if (cmd.stop_timer >= cmd.stoptime):
-					cmd.process.send_signal(9) ; print ("process killed")
-				cmd.stop_timer += 1
-			'''elif (cmd.process and cmd.start_timer >=0):
+					cmd.process.send_signal(9) ;
+					print ("process killed")
+				else:
+					cmd.stop_timer += 1
+			elif (cmd.process and cmd.start_timer >=0):
 				if (cmd.start_timer >= cmd.starttime):
 					cmd.start_timer = -1
 					cmd.status = "RUNNING"
 					cmd.show_status()
-					print ("process launch correctly")
-				cmd.start_timer += 1'''
-
-
-task = cmd_info()
+				else:
+					cmd.start_timer += 1

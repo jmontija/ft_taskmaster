@@ -2,7 +2,7 @@ import os
 import time
 import shlex
 import subprocess
-import cmd_info
+import task_lib
 
 def in_config(params, name):
 	if (params):
@@ -11,7 +11,7 @@ def in_config(params, name):
 				return (params[k])
 	return None
 
-class cmd_data:
+class cmd_event:
 
 	def __init__(self, key, params):
 		self.id = key
@@ -27,7 +27,7 @@ class cmd_data:
 		self.start_timer = -1
 		self.startretries = in_config(params, "startretries") or 1
 		self.start_fail = 0
-		self.stop_signal = cmd_info.signaux.get_signum(in_config(params, "stopsignal")) or 15
+		self.stop_signal = task_lib.signaux.get_signum(in_config(params, "stopsignal")) or 15
 		self.stoptime = in_config(params, "stoptime") or 10
 		self.stop_timer = -1
 		self.time = 0
@@ -36,7 +36,6 @@ class cmd_data:
 
 	def start(self, autostart):
 		try:
-			#time.sleep(self.starttime)
 			cmd_split = shlex.split(self.path)
 			stdout_path = open(self.stdout, "a")
 			stderr_path = open(self.stderr, "a")
@@ -49,9 +48,6 @@ class cmd_data:
 				env = os.environ
 			)
 			self.start_timer = 0
-			self.status = "RUNNING"
-			if (autostart == False):
-				self.show_status()
 			self.process = proc
 		except Exception, e:
 			print("bad program -> " + self.id)

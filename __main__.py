@@ -1,7 +1,7 @@
 import cmd
-from cmd_info import task
+from task_lib import task
 
-class HelloWorld(cmd.Cmd):
+class keyboard(cmd.Cmd):
 
     prompt = 'task MASTER: '
 
@@ -35,4 +35,4 @@ class HelloWorld(cmd.Cmd):
 if __name__ == "__main__":
 	task.autostart()
 	task.status()
-	HelloWorld().cmdloop()
+	keyboard().cmdloop()
