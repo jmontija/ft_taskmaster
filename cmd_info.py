@@ -88,6 +88,13 @@ class cmd_info:
 				if (cmd.stop_timer >= cmd.stoptime):
 					cmd.process.send_signal(9) ; print ("process killed")
 				cmd.stop_timer += 1
+			'''elif (cmd.process and cmd.start_timer >=0):
+				if (cmd.start_timer >= cmd.starttime):
+					cmd.start_timer = -1
+					cmd.status = "RUNNING"
+					cmd.show_status()
+					print ("process launch correctly")
+				cmd.start_timer += 1'''
 
 
 task = cmd_info()

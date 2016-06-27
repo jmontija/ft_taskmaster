@@ -24,6 +24,7 @@ class cmd_data:
 		self.autorestart = in_config(params, "autorestart") or "unexpected"
 		self.exit = in_config(params, "exitcodes") or [0, 2]
 		self.starttime = in_config(params, "starttime") or 1
+		self.start_timer = -1
 		self.startretries = in_config(params, "startretries") or 1
 		self.start_fail = 0
 		self.stop_signal = cmd_info.signaux.get_signum(in_config(params, "stopsignal")) or 15
@@ -35,7 +36,7 @@ class cmd_data:
 
 	def start(self, autostart):
 		try:
-			time.sleep(self.starttime)
+			#time.sleep(self.starttime)
 			cmd_split = shlex.split(self.path)
 			stdout_path = open(self.stdout, "a")
 			stderr_path = open(self.stderr, "a")
@@ -47,10 +48,11 @@ class cmd_data:
 				stderr = stderr_path,
 				env = os.environ
 			)
+			self.start_timer = 0
 			self.status = "RUNNING"
-			self.process = proc
 			if (autostart == False):
 				self.show_status()
+			self.process = proc
 		except Exception, e:
 			print("bad program -> " + self.id)
 
@@ -73,9 +75,12 @@ class cmd_data:
 		self.process = None
 		self.status = "WAITING"
 		self.show_status()
-		for exit in self.exit:
-			if (exit == signum):
-				self.start(False)
+		if (self.autorestart == True):
+			self.start(False)
+		elif (self.autorestart == "unexpected"):
+			for exit in self.exit:
+				if (exit == signum):
+					self.start(False)
 
 
 
