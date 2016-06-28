@@ -53,12 +53,15 @@ class cmd_event:
 			print("bad program -> " + self.id)
 
 	def stop(self):
-		self.process.send_signal(self.stop_signal)
-		self.stop_timer = 0
+		if (self.process != None):
+			self.process.send_signal(self.stop_signal)
+			self.stop_timer = 0
+		else:
+			print ("no process found")
 
 	def show_status(self):
 		if (self.process):
-			print('{0:20}{1:15}{2:15}{3:15}{4:15}'.format(self.id, self.status, "  pid ", str(self.process.pid), "  uptime ", str(self.time)))
+			print('{0:28}{1:24}{2:15}{3:23}{4:15}'.format('\033[1m' + self.id +'\033[0m', '\033[92m'+ self.status + '\033[0m', "  pid ", '\033[1m' + str(self.process.pid) + '\033[0m', "  uptime ", str(self.time)))
 		else:
 			print('{0:20}{1:15}{2:15}{3:15}{4:15}'.format(self.id, self.status, "  pid ", '0', "  uptime ", str(self.time)))
 

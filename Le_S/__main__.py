@@ -1,15 +1,21 @@
 import cmd
 from task_lib import task
 
-class keyboard(cmd.Cmd):
+def opening():
+    try:
+        fd = open("opening.master", "r")
+        print fd.read()
+    except:
+        print ("opening failed___\n\n")
 
-    prompt = 'task MASTER: '
+class keyboard(cmd.Cmd):
+    prompt = '\033[31m' + '\033[1m' + '(Deamon_Master): ' + '\033[39m' + '\033[0m'
 
     def emptyline(self):
     	pass
 
     def do_status(self, line):
-    	task.status()
+    	task.status(line)
 
     def do_start(self, line):
     	task.start(line)
@@ -33,6 +39,7 @@ class keyboard(cmd.Cmd):
         return True
 
 if __name__ == "__main__":
-	task.autostart()
-	task.status()
-	keyboard().cmdloop()
+    opening()
+    task.autostart()
+    task.status("")
+    keyboard().cmdloop()

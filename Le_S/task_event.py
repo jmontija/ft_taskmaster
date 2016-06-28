@@ -1,6 +1,7 @@
 import yaml
 from cmd_event import cmd_event
 import copy
+import pyautogui
 
 
 
@@ -77,10 +78,17 @@ class task_event:
 		else:
 			print ("task: no process found " + line)
 
-	def	status(self):
-		for k, v in self.cmd.iteritems():
-			cmd = self.cmd[k]
-			cmd.show_status()
+	def	status(self, line):
+		# if (line):
+		# 	for k, v in self.cmd.iteritems():
+		# 		cmd = self.cmd[k]
+		# 		if (str(cmd.id) == str(line))
+		# 			cmd.show_status()
+		# 			break
+		# else:
+			for k, v in self.cmd.iteritems():
+				cmd = self.cmd[k]
+				cmd.show_status()
 
 	def check_status(self):
 		for k, v in self.cmd.iteritems():
@@ -89,18 +97,23 @@ class task_event:
 				sig_num = cmd.process.returncode
 				if (sig_num < 0):
 					sig_num *= -1
+				print("")
 				cmd.finish(sig_num);
+				pyautogui.press('enter')
 			elif (cmd.process and cmd.stop_timer >= 0):
 				if (cmd.stop_timer >= cmd.stoptime):
 					cmd.process.send_signal(9) ;
-					print ("process killed")
+					print ("\nprocess killed")
+					pyautogui.press('enter')
 				else:
 					cmd.stop_timer += 1
 			elif (cmd.process and cmd.start_timer >=0):
 				if (cmd.start_timer >= cmd.starttime):
 					cmd.start_timer = -1
 					cmd.status = "RUNNING"
+					print ("")
 					cmd.show_status()
+					pyautogui.press('enter')
 				else:
 					cmd.start_timer += 1
 

@@ -1,5 +1,6 @@
 import signal
 import task_lib
+import pyautogui
 
 class siglib:
 
