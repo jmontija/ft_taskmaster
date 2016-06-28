@@ -1,4 +1,5 @@
 import yaml
+import task_lib
 from cmd_event import cmd_event
 
 def load_conf(file):
@@ -30,7 +31,9 @@ class task_event:
 			self.cmd[k] = cmd_class
 			while (i < cmd_class.numprocs):
 				name = k + str(i)
-				self.cmd[name] = cmd_event(name, v)
+				self.cmd[name] = task_lib.dup(self.cmd[k])
+				self.cmd[name].id = name
+				self.cmd[name].parent = self.cmd[k]
 				i += 1
 
 	def	autostart(self):
@@ -45,10 +48,12 @@ class task_event:
 			cmd = self.cmd[k]
 			if (line and cmd.id == line):
 				find = True
-				if (cmd.status == "WAITING"):
+				if (cmd.status == "WAITING" or cmd.status == "FAILED"):
 					cmd.start(False);
-				elif (cmd.status == "RUNNING"):
-					print ("task: Command " + line + " already RUNNING")
+				elif (cmd.status == "RUNNING" or cmd.status == "STARTING"):
+					print ("task: Command " + line + " already STARTING/RUNNING")
+				else:
+					print ("task: FATAL_ERROR: " + cmd.id)
 				break
 		if (find == False):
 			print ("task: no process found " + line)

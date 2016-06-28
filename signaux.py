@@ -16,7 +16,7 @@ class siglib:
 					return (v)
 		elif (name == None):
 			return (15)
-		return (0)
+		return (-1)
 
 	def sig_int(self ,signal, frame):
 		pass
