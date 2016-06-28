@@ -79,13 +79,13 @@ class task_event:
 			print ("task: no process found " + line)
 
 	def	status(self, line):
-		# if (line):
-		# 	for k, v in self.cmd.iteritems():
-		# 		cmd = self.cmd[k]
-		# 		if (str(cmd.id) == str(line))
-		# 			cmd.show_status()
-		# 			break
-		# else:
+		if (line):
+			for k, v in self.cmd.iteritems():
+				cmd = self.cmd[k]
+				if (str(cmd.id) == str(line)):
+					cmd.show_status()
+					break
+		else:
 			for k, v in self.cmd.iteritems():
 				cmd = self.cmd[k]
 				cmd.show_status()
