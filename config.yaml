@@ -24,7 +24,7 @@ programs:
       numprocs: 1
       umask: 077
       workingdir: "/tmp"
-      autostart: false
+      autostart: 4
       autorestart: "unexpected"
       exitcodes:
         - 0
@@ -44,6 +44,7 @@ programs:
         - 0
         - 15
       startretries: 3
+      stopsignal: "FAKE"
       starttime: 1
       stoptime: 10
       stdout: "/tmp/taskwc.stdout"

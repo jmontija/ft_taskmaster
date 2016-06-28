@@ -50,6 +50,7 @@ class task_event:
 				find = True
 				if (cmd.status == "WAITING" or cmd.status == "FAILED"):
 					cmd.start(False);
+					cmd.show_status()
 				elif (cmd.status == "RUNNING" or cmd.status == "STARTING"):
 					print ("task: Command " + line + " already STARTING/RUNNING")
 				else:
@@ -62,6 +63,7 @@ class task_event:
 		curr = check_pid(self.cmd, line)
 		if (curr != None):
 			curr.restart()
+			curr.show_status()
 		else:
 			print ("task: no process found " + line)
 
@@ -69,6 +71,7 @@ class task_event:
 		curr = check_pid(self.cmd, line)
 		if (curr != None):
 			curr.stop()
+			curr.show_status()
 		else:
 			print ("task: no process found " + line)
 
@@ -87,7 +90,7 @@ class task_event:
 				cmd.finish(sig_num);
 			elif (cmd.process and cmd.stop_timer >= 0):
 				if (cmd.stop_timer >= cmd.stoptime):
-					cmd.process.send_signal(9) ;
+					cmd.process.send_signal(9);
 					print ("process killed")
 				else:
 					cmd.stop_timer += 1
@@ -95,6 +98,5 @@ class task_event:
 				if (cmd.start_timer >= cmd.starttime):
 					cmd.start_timer = -1
 					cmd.status = "RUNNING"
-					cmd.show_status()
 				else:
 					cmd.start_timer += 1
