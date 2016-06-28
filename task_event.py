@@ -30,7 +30,7 @@ class task_event:
 			cmd_class = cmd_event(k, v)
 			self.cmd[k] = cmd_class
 			while (i < cmd_class.numprocs):
-				name = k + str(i)
+				name = k + ":0" + str(i)
 				self.cmd[name] = task_lib.dup(self.cmd[k])
 				self.cmd[name].id = name
 				self.cmd[name].parent = self.cmd[k]
@@ -46,7 +46,7 @@ class task_event:
 		find = False
 		for k, v in self.cmd.iteritems():
 			cmd = self.cmd[k]
-			if (line and cmd.id == line):
+			if (line and (line == cmd.id or line == "all")):
 				find = True
 				if (cmd.status == "WAITING" or cmd.status == "FAILED"):
 					cmd.start(False);

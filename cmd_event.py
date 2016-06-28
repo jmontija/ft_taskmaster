@@ -9,17 +9,17 @@ def check_path(path):
 	print ("need to check if " + path + " exist")
 	return (True)
 
-def special_params(params, name):
+def special_params(cmd, params, name):
 	if (name == "autorestart"):
 		if ((type(params[name]) is int and params[name] < 0) or params[name] != "unexpected"):
-			print ("task: wrong autorestart data")
+			cmd.state = "wrong autorestart data"
 			return (False)
 	elif (name == "exitcodes"):
 		if (type(params[name]) is not list):
 			return (False)
 		for exit in params[name]:
 			if ((type(exit) is int and exit < 0) or type(exit) is not int):
-				print ("task: wrong exit data")
+				cmd.state = "wrong exit data"
 				return (False)
 	return (True)
 
@@ -37,22 +37,22 @@ def check_validity(cmd, params, name):
 		"numprocs": int,
 	}
 	if (name == "autorestart" or name == "exitcodes"):
-		return (special_params(params, name))
+		return (special_params(cmd, params, name))
 	elif (type(params[name]) is type_define[name]):
 		if (type_define[name] is int and params[name] < 0):
-			cmd.state = "negative value -> " + name
+			cmd.state = "positive value expected -> " + name
 			return (False)
 		elif (type_define[name] is str):
 			if (name == "stopsignal"):
 				ret = task_lib.signaux.get_signum(params[name])
-				if (ret < 0):
+				if (ret < 0 or ret > 30):
 					cmd.state = "wrong signal -> " + name
 					return (False)
 			elif (check_path(params[name]) == False):
 				cmd.state = "wrong path -> " + params[name]
 				return (False)
 	elif (type(params[name]) is not type_define[name]):
-		cmd.state = "wrong params -> " + name
+		cmd.state = "wrong type params -> " + name
 		return (False)
 	return (True)
 
@@ -113,7 +113,6 @@ class cmd_event:
 				print("bad program -> " + self.id)
 		else:
 			self.status = "FATAL"
-			print self.state
 
 	def stop(self):
 		self.process.send_signal(self.stop_signal)

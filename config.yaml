@@ -4,7 +4,7 @@ programs:
 
     cat:
       cmd: "/bin/cat" #
-      numprocs: "TEST" #
+      numprocs: 5 #
       umask: 022
       workingdir: "/tmp" #
       autostart: false #
@@ -44,7 +44,7 @@ programs:
         - 0
         - 15
       startretries: 3
-      stopsignal: "FAKE"
+      stopsignal: 15
       starttime: 1
       stoptime: 10
       stdout: "/tmp/taskwc.stdout"
