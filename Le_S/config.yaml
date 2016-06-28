@@ -1,0 +1,83 @@
+programs:
+
+    empty:
+
+    cat:
+      cmd: "/bin/cat"
+      numprocs: 1
+      umask: 022
+      workingdir: "/tmp"
+      autostart: false
+      autorestart: "unexpected"
+      exitcodes:
+        - 0
+        - 2
+      startretries: 3
+      starttime: 1
+      stopsignal: "TERM"
+      stoptime: 10
+      stdout: "/tmp/taskcat.stdout"
+      stderr: "/tmp/taskcat.stderr"
+
+    new:
+      cmd: "/bin/cat . -"
+      numprocs: 1
+      umask: 022
+      workingdir: "/tmp"
+      autostart: false
+      autorestart: "unexpected"
+      exitcodes:
+        - 0
+        - 2
+      startretries: 3
+      starttime: 1
+      stopsignal: "TERM"
+      stoptime: 10
+      stdout: "/tmp/taskcat.stdout"
+      stderr: "/tmp/taskcat.stderr"
+
+    ls:
+      cmd: "ls -R /Applications"
+      numprocs: 1
+      umask: 077
+      workingdir: "/tmp"
+      autostart: false
+      autorestart: "unexpected"
+      exitcodes:
+        - 0
+        - 2
+      startretries: 3
+      starttime: 1
+      stopsignal: "USR1"
+      stoptime: 10
+      stdout: "/tmp/taskls.stdout"
+      stderr: "/tmp/taskls.stderr"
+
+    wc:
+      cmd: "/usr/bin/wc"
+      umask: 077
+      autostart: false
+      exitcodes:
+        - 0
+        - 15
+      startretries: 3
+      starttime: 1
+      stoptime: 10
+      stdout: "/tmp/taskwc.stdout"
+
+    fail:
+      cmd: "/fail"
+      numprocs: 1
+      umask: 077
+      workingdir: "/tmp"
+      autostart: false
+      autorestart: "unexpected"
+      exitcodes:
+        - 0
+        - 2
+      startretries: 3
+      starttime: 2
+      stopsignal: "USR1"
+      stoptime: 10
+      stdout: "/tmp/taskwc.stdout"
+      stderr: "/tmp/taskwc.stderr"
