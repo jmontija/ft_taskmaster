@@ -1,4 +1,5 @@
 import yaml
+import task_lib
 from cmd_event import cmd_event
 
 def load_conf(file):
@@ -29,8 +30,10 @@ class task_event:
 			cmd_class = cmd_event(k, v)
 			self.cmd[k] = cmd_class
 			while (i < cmd_class.numprocs):
-				name = k + str(i)
-				self.cmd[name] = cmd_event(name, v)
+				name = k + ":0" + str(i)
+				self.cmd[name] = task_lib.dup(self.cmd[k])
+				self.cmd[name].id = name
+				self.cmd[name].parent = self.cmd[k]
 				i += 1
 
 	def	autostart(self):
@@ -43,12 +46,15 @@ class task_event:
 		find = False
 		for k, v in self.cmd.iteritems():
 			cmd = self.cmd[k]
-			if (line and cmd.id == line):
+			if (line and (line == cmd.id or line == "all")):
 				find = True
-				if (cmd.status == "WAITING"):
+				if (cmd.status == "WAITING" or cmd.status == "FAILED"):
 					cmd.start(False);
-				elif (cmd.status == "RUNNING"):
-					print ("task: Command " + line + " already RUNNING")
+					cmd.show_status()
+				elif (cmd.status == "RUNNING" or cmd.status == "STARTING"):
+					print ("task: Command " + line + " already STARTING/RUNNING")
+				else:
+					print ("task: FATAL_ERROR: " + cmd.id)
 				break
 		if (find == False):
 			print ("task: no process found " + line)
@@ -57,6 +63,7 @@ class task_event:
 		curr = check_pid(self.cmd, line)
 		if (curr != None):
 			curr.restart()
+			curr.show_status()
 		else:
 			print ("task: no process found " + line)
 
@@ -64,6 +71,7 @@ class task_event:
 		curr = check_pid(self.cmd, line)
 		if (curr != None):
 			curr.stop()
+			curr.show_status()
 		else:
 			print ("task: no process found " + line)
 
@@ -82,7 +90,7 @@ class task_event:
 				cmd.finish(sig_num);
 			elif (cmd.process and cmd.stop_timer >= 0):
 				if (cmd.stop_timer >= cmd.stoptime):
-					cmd.process.send_signal(9) ;
+					cmd.process.send_signal(9);
 					print ("process killed")
 				else:
 					cmd.stop_timer += 1
@@ -90,6 +98,5 @@ class task_event:
 				if (cmd.start_timer >= cmd.starttime):
 					cmd.start_timer = -1
 					cmd.status = "RUNNING"
-					cmd.show_status()
 				else:
 					cmd.start_timer += 1
