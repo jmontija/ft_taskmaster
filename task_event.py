@@ -1,28 +1,10 @@
-import yaml
 import task_lib
 from cmd_event import cmd_event
-
-def load_conf(file):
-	try:
-		fd = open(file, "r")
-		data = yaml.load(fd)
-		return data
-	except Exception, e:
-		print("error config -> " + file)
-
-def check_pid(cmd, line):
-	try:
-		for k, v in cmd.iteritems():
-			curr = cmd[k]
-			if (curr.process and curr.process.pid == int(line)):
-				return (curr)
-	except Exception, e:
-		return (None)
 
 class task_event:
 
 	def __init__(self):
-		data = load_conf("config.yaml")
+		data = task_lib.load_conf("config.yaml")
 		cmd = data.get("programs")
 		self.cmd = {}
 		i = 1
@@ -55,30 +37,79 @@ class task_event:
 					print ("task: Command " + line + " already STARTING/RUNNING")
 				else:
 					print ("task: FATAL_ERROR: " + cmd.id)
-				break
+				if (line != "all"):
+					break
 		if (find == False):
 			print ("task: no process found " + line)
 
 	def	restart(self, line):
-		curr = check_pid(self.cmd, line)
-		if (curr != None):
-			curr.restart()
-			curr.show_status()
+		if (str(line) == "all"):
+			for k, v in self.cmd.iteritems():
+				cmd = self.cmd[k]
+				curr = task_lib.check_process(self.cmd, cmd.id)
+				if (curr != None):
+					curr.restart()
 		else:
-			print ("task: no process found " + line)
+			curr = task_lib.check_process(self.cmd, line)
+			if (curr != None):
+				curr.restart()
+			else:
+				print ("task: no process found " + line)
 
 	def	stop(self, line):
-		curr = check_pid(self.cmd, line)
+		curr = task_lib.check_process(self.cmd, line)
 		if (curr != None):
 			curr.stop()
 			curr.show_status()
 		else:
 			print ("task: no process found " + line)
 
-	def	status(self):
+	def	status(self, line):
+		if (line):
+			for k, v in self.cmd.iteritems():
+				cmd = self.cmd[k]
+				if (cmd.id == str(line)):
+					cmd.show_status()
+					break
+		else:
+			for k, v in self.cmd.iteritems():
+				cmd = self.cmd[k]
+				cmd.show_status()
+
+	def reload(self):
+		new_task = task_event()
 		for k, v in self.cmd.iteritems():
+			i = 0;
 			cmd = self.cmd[k]
-			cmd.show_status()
+		#
+			for l, w in new_task.cmd.iteritems():
+				cmd_comp = new_task.cmd[l]
+		#	#
+				if (cmd.id == cmd_comp.id):
+					i = 1
+		#	#	#
+					if (cmd.path == cmd_comp.path and cmd.stdout == cmd_comp.stdout and cmd.stderr == cmd_comp.stderr and cmd.workingdir == cmd_comp.workingdir):
+
+						if (cmd.status == "RUNNING"):
+							cmd_comp = copy.deepcopy(cmd)
+							new_task.cmd[l] = cmd_comp
+						elif (cmd.status == "WAITING"):
+							if (cmd_comp.autostart == True):
+								cmd_comp.start(True)
+						break
+
+					elif (cmd.process):
+						cmd.stop()
+						cmd_comp.start(True)
+			if (i == 0 and cmd.process):
+				cmd.stop()
+		self.cmd = new_task.cmd
+
+		for a, b in new_task.cmd.iteritems():
+				cmd_comp = new_task.cmd[a]
+				if (cmd_comp.autostart == True and cmd_comp.status == "WAITING" and cmd_comp.process == None):
+					cmd_comp.start(True)
+		self.status(None)
 
 	def check_status(self):
 		for k, v in self.cmd.iteritems():

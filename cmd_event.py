@@ -102,6 +102,7 @@ class cmd_event:
 					env = os.environ
 				)
 				self.status = "STARTING"
+				self.stop_timer = -1
 				self.start_timer = 0
 				self.process = proc
 			except Exception, e:
@@ -116,14 +117,14 @@ class cmd_event:
 
 	def stop(self):
 		self.process.send_signal(self.stop_signal)
-		self.start_fail = 0
 		self.start_timer = -1
+		self.start_fail = 0
 		self.status = "STOPPING"
 		self.stop_timer = 0
 
 	def show_status(self):
 		if (self.process):
-			print('{0:20}{1:15}{2:15}{3:15}{4:15}'.format(self.id, self.status, "  pid ", str(self.process.pid), "  uptime ", str(self.time)))
+			print('{0:28}{1:24}{2:15}{3:23}{4:15}'.format('\033[1m' + self.id +'\033[0m', '\033[92m'+ self.status + '\033[0m', "  pid ", '\033[1m' + str(self.process.pid) + '\033[0m', "  uptime ", str(self.time)))
 		else:
 			print('{0:20}{1:15}{2:15}'.format(self.id, self.status, self.state))
 
@@ -135,7 +136,7 @@ class cmd_event:
 		self.start_timer = -1
 		self.stop_timer = -1
 		self.process = None
-		self.status = "WAITING"
+		self.status = '\033[31m' +  "STOPPED" + '\033[39m'
 		if (self.autorestart == True):
 			self.start(False)
 		elif (self.autorestart == "unexpected"):
