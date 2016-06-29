@@ -1,25 +1,20 @@
 import os
-import stat
 import time
 import shlex
 import subprocess
 import task_lib
 
-def check_path(path):
-	print ("need to check if " + path + " exist")
-	return (True)
-
 def special_params(cmd, params, name):
 	if (name == "autorestart"):
 		if ((type(params[name]) is int and params[name] < 0) or params[name] != "unexpected"):
-			cmd.state = "wrong autorestart data"
+			cmd.state = "ERR config -> " + name
 			return (False)
 	elif (name == "exitcodes"):
 		if (type(params[name]) is not list):
 			return (False)
 		for exit in params[name]:
 			if ((type(exit) is int and exit < 0) or type(exit) is not int):
-				cmd.state = "wrong exit data"
+				cmd.state = "ERR config -> " + name
 				return (False)
 	return (True)
 
@@ -35,24 +30,16 @@ def check_validity(cmd, params, name):
 		"startretries": int,
 		"stoptime": int,
 		"numprocs": int,
+		"umask": int
 	}
 	if (name == "autorestart" or name == "exitcodes"):
 		return (special_params(cmd, params, name))
 	elif (type(params[name]) is type_define[name]):
 		if (type_define[name] is int and params[name] < 0):
-			cmd.state = "positive value expected -> " + name
+			cmd.state = "ERR config -> " + name
 			return (False)
-		elif (type_define[name] is str):
-			if (name == "stopsignal"):
-				ret = task_lib.signaux.get_signum(params[name])
-				if (ret < 0 or ret > 30):
-					cmd.state = "wrong signal -> " + name
-					return (False)
-			elif (check_path(params[name]) == False):
-				cmd.state = "wrong path -> " + params[name]
-				return (False)
 	elif (type(params[name]) is not type_define[name]):
-		cmd.state = "wrong type params -> " + name
+		cmd.state = "ERR config -> " + name
 		return (False)
 	return (True)
 
@@ -63,12 +50,43 @@ def in_config(cmd, params, name):
 				return (params[name])
 	return None
 
+def	post_init(cmd):
+
+	if (cmd.umask > 7777): cmd.state = "ERR config -> umask"
+	if (cmd.numprocs > 100): cmd.state = "ERR config -> too many processus"
+	if (cmd.workingdir[0] != "/" or os.access(cmd.workingdir, os.W_OK) == False): cmd.state = "ERR config -> wrong path"
+	if (cmd.stop_signal < 0 or cmd.stop_signal > 30): cmd.state = "ERR config -> signaux"
+
+	# OPEN
+	try:
+		if (cmd.state == "READY"):
+			cmd.stdout = os.open(cmd.stdout, os.O_WRONLY | os.O_CREAT, cmd.umask)
+			cmd.stderr = os.open(cmd.stderr, os.O_WRONLY | os.O_CREAT, cmd.umask)
+	except OSError, e:
+		cmd.state = "ERR opening -> " + e.filename
+
+	#CHECK_PATH
+	if (cmd.path[0] == '.' or cmd.path[0] == '/'):
+		if os.access(cmd.path, os.X_OK) == False:
+			cmd.state = "ERR command -> " + cmd.path
+	else:
+		find = False
+		path_env = os.environ["PATH"]
+		path_env = path_env.split(":")
+		curr_cmd = cmd.path.split()[0]
+		for path in path_env:
+			curr_path = path + "/" + curr_cmd
+			if os.access(curr_path, os.X_OK) == True:
+				find = True
+				break
+		if (find == False): cmd.state = "ERR command -> " + curr_cmd
+
 class cmd_event:
 
 	def __init__(self, key, params):
 		self.id = key
 		self.status = "WAITING"
-		self.state = "NOT STARTING"
+		self.state = "READY"
 		self.path = in_config(self, params, "cmd") or "/ERROR"
 		self.workingdir = in_config(self, params, "workingdir") or "/tmp"
 		self.numprocs = in_config(self, params, "numprocs") or 1
@@ -83,22 +101,24 @@ class cmd_event:
 		self.start_fail = 0
 		self.stop_signal = task_lib.signaux.get_signum(in_config(self, params, "stopsignal")) or 15
 		self.stoptime = in_config(self, params, "stoptime") or 10
+		self.umask = in_config(self, params, "umask") or 644
 		self.stop_timer = -1
 		self.time = 0
 		self.process = None
 
+		if (self.state == "READY"): post_init(self)
+		if (self.state != "READY"): self.status = "FATAL"
+
 	def start(self, autostart):
-		if (self.state ==  "NOT STARTING"):
+		if (self.state ==  "READY"):
 			try:
 				cmd_split = shlex.split(self.path)
-				stdout_path = open(self.stdout, "a")
-				stderr_path = open(self.stderr, "a")
 				proc = subprocess.Popen(
 					cmd_split,
 					cwd = self.workingdir,
 					stdin = subprocess.PIPE,
-					stdout = stdout_path,
-					stderr = stderr_path,
+					stdout = self.stdout,
+					stderr = self.stderr,
 					env = os.environ
 				)
 				self.status = "STARTING"
@@ -110,8 +130,8 @@ class cmd_event:
 					self.status = "FATAL"
 				else:
 					self.status = "FAILED"
+					self.state = "ERR processus"
 				self.start_fail +=1
-				#print("bad program -> " + self.id)
 		else:
 			self.status = "FATAL"
 
@@ -123,11 +143,15 @@ class cmd_event:
 		self.stop_timer = 0
 
 	def show_status(self):
-		task_lib.line_format(self)
+		# task_lib.line_format(self)
 		# if (self.process):
 		# 	print('{0:28}{1:24}{2:15}{3:23}{4:15}'.format('\033[1m' + self.id +'\033[0m', '\033[92m'+ self.status + '\033[0m', "  pid ", '\033[1m' + str(self.process.pid) + '\033[0m', "  uptime ", str(self.time)))
 		# else:
 		# 	print('{0:20}{1:25}{2:15}'.format(self.id, self.status, self.state))
+		if (self.process):
+			print('{0:28}{1:24}{2:15}{3:23}{4:15}'.format('\033[1m' + self.id +'\033[0m', '\033[92m'+ self.status + '\033[0m', "  pid ", '\033[1m' + str(self.process.pid) + '\033[0m', "  uptime ", str(self.time)))
+		else:
+			print('{0:20}{1:15}{2:15}'.format(self.id, self.status, self.state))
 
 	def restart(self):
 		self.stop()
