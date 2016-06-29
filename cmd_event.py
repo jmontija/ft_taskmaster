@@ -53,7 +53,7 @@ def in_config(cmd, params, name):
 def	post_init(cmd):
 
 	if (cmd.umask > 7777): cmd.state = "ERR config -> umask"
-	if (cmd.numprocs > 100): cmd.state = "ERR config -> too many processus"
+	if (cmd.numprocs > 500): cmd.state = "ERR config -> too many processus"
 	if (cmd.workingdir[0] != "/" or os.access(cmd.workingdir, os.W_OK) == False): cmd.state = "ERR config -> wrong path"
 	if (cmd.stop_signal < 0 or cmd.stop_signal > 30): cmd.state = "ERR config -> signaux"
 
@@ -107,7 +107,9 @@ class cmd_event:
 		self.process = None
 
 		if (self.state == "READY"): post_init(self)
-		if (self.state != "READY"): self.status = "FATAL"
+		if (self.state != "READY"):
+			self.status = "FATAL"
+			log.warning(self.id + ': ' + self.state)
 
 	def start(self, autostart):
 		if (self.state ==  "READY"):
