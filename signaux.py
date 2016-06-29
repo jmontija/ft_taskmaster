@@ -14,8 +14,6 @@ class siglib:
 			for k, v in self.dico.iteritems():
 				if k.startswith('SIG') and not k.startswith('SIG_') and k.endswith(name):
 					return (v)
-		elif (name == None):
-			return (15)
 		return (-1)
 
 	def sig_int(self ,signal, frame):
