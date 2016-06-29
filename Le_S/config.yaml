@@ -24,7 +24,7 @@ programs:
       numprocs: 1
       umask: 077
       workingdir: "/tmp"
-      autostart: 4
+      autostart: false
       autorestart: "unexpected"
       exitcodes:
         - 0
