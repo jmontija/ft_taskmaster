@@ -49,13 +49,13 @@ def format_statut(line):
 
 def line_format(self):
 	if (self.process):
-		print('{0:37}{1:27}{2:15}{3:23}{4:15}'\
-			.format(color_string("BOLD", self.id), \
-				format_statut(str(self.status)), \
-				"  pid ", \
-			color_string("BOLD", str(self.process.pid)), \
-				"  uptime ",\
-				 str(self.time)))
+		print('{0:37}{1:27}{2:15}{3:23}{4:15}'.format( \
+					color_string("BOLD", self.id), \
+					format_statut(self.status), \
+					"  pid ", \
+					color_string("BOLD", str(self.process.pid)), \
+					"  uptime ",\
+				 	str(self.time)))
 	else:
 		print('{0:24}{1:27}{2:15}'\
 			.format(self.id, \

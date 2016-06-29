@@ -1,6 +1,35 @@
 import task_lib
 from cmd_event import cmd_event
 
+def print_all_info(self, line):
+	try:
+		print ("_"*35 + " < " + line + " > " + "_"*35)
+		# print   "Status:              " + task_lib.format_statut(self.status))
+
+		# print(task_lib.format_statut(str(self.status)))
+		print(  "Status:              " + task_lib.format_statut(self.status))
+		print(	"Stats:               " + str(self.state))
+		print(	"Path:                " + str(self.path))
+		print(	"workingdir:          " + str(self.workingdir))
+		print(	"Numprocs:            " + str(self.numprocs))
+		print(	"Stdout | Stderr:     " + str(self.stdout) + " | " + str(self.stderr))
+		print(	"Autostart:           " + str(self.autostart))
+		print(	"Autorestart:         " + str(self.autorestart))
+		print(	"Exit codes:          " + str(self.exit))
+		print(	"Stop signal:         " + str(self.stop_signal))
+		print(	"Start fail | retry:  " + str(self.start_fail) + " | " +str(self.startretries))
+		print(	"Stop time:           " + str(self.stoptime) )
+		if (self.process != None):
+			print ("_PROCESS_INFO" + "_"*((70-13 + len(line))/2))
+			print ("PID:            " + str(self.process.pid))
+			print ("Process stdin:  " + str(self.process.stdin))
+			print ("Process stdout: " + str(self.process.stdout))
+			print ("Process stderr: " + str(self.process.stderr))
+
+
+	except:
+		print ("Info: " + line + ": Failed (INFOERR)")
+
 class task_event:
 
 	def __init__(self):
@@ -30,7 +59,7 @@ class task_event:
 			cmd = self.cmd[k]
 			if (line and (line == cmd.id or line == "all")):
 				find = True
-				if (cmd.status == "WAITING" or cmd.status == "FAILED"):
+				if (cmd.status == "WAITING" or cmd.status == "FAILED" or cmd.status == "STOPPED"):
 					cmd.start(False);
 					cmd.show_status()
 				elif (cmd.status == "RUNNING" or cmd.status == "STARTING"):
@@ -81,13 +110,10 @@ class task_event:
 		for k, v in self.cmd.iteritems():
 			i = 0;
 			cmd = self.cmd[k]
-		#
 			for l, w in new_task.cmd.iteritems():
 				cmd_comp = new_task.cmd[l]
-		#	#
 				if (cmd.id == cmd_comp.id):
 					i = 1
-		#	#	#
 					if (cmd.path == cmd_comp.path and cmd.stdout == cmd_comp.stdout and cmd.stderr == cmd_comp.stderr and cmd.workingdir == cmd_comp.workingdir):
 
 						if (cmd.status == "RUNNING" or cmd.status == "STARTING"):
@@ -97,14 +123,12 @@ class task_event:
 							if (cmd_comp.autostart == True):
 								cmd_comp.start(True)
 						break
-
 					elif (cmd.process):
 						cmd.stop()
 						cmd_comp.start(True)
 			if (i == 0 and cmd.process):
 				cmd.stop()
 		self.cmd = new_task.cmd
-
 		for a, b in new_task.cmd.iteritems():
 				cmd_comp = new_task.cmd[a]
 				if (cmd_comp.autostart == True and cmd_comp.status == "WAITING" and cmd_comp.process == None):
@@ -131,3 +155,28 @@ class task_event:
 					cmd.status = "RUNNING"
 				else:
 					cmd.start_timer += 1
+
+	def info(self, line):
+		if (line):
+			for k, v in self.cmd.iteritems():
+				cmd = self.cmd[k]
+				if (cmd.id == str(line)):
+					print_all_info(cmd, line)
+					break
+		else:
+			print ("info requiere a target")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
