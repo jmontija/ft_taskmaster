@@ -1,6 +1,5 @@
 import signal
 import task_lib
-import pyautogui
 
 class siglib:
 
@@ -8,7 +7,7 @@ class siglib:
 		self.dico = signal.__dict__
 		signal.signal(signal.SIGALRM, self.sig_alarm)
 		signal.signal(signal.SIGINT, self.sig_int)
-		signal.alarm(5)
+		signal.alarm(10)
 
 	def get_signum(self, name):
 		if (name):
@@ -17,7 +16,7 @@ class siglib:
 					return (v)
 		elif (name == None):
 			return (15)
-		return (0)
+		return (-1)
 
 	def sig_int(self ,signal, frame):
 		pass
