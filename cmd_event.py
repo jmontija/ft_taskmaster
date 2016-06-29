@@ -111,7 +111,7 @@ class cmd_event:
 				else:
 					self.status = "FAILED"
 				self.start_fail +=1
-				print("bad program -> " + self.id)
+				#print("bad program -> " + self.id)
 		else:
 			self.status = "FATAL"
 
@@ -126,7 +126,7 @@ class cmd_event:
 		if (self.process):
 			print('{0:28}{1:24}{2:15}{3:23}{4:15}'.format('\033[1m' + self.id +'\033[0m', '\033[92m'+ self.status + '\033[0m', "  pid ", '\033[1m' + str(self.process.pid) + '\033[0m', "  uptime ", str(self.time)))
 		else:
-			print('{0:20}{1:15}{2:15}'.format(self.id, self.status, self.state))
+			print('{0:20}{1:25}{2:15}'.format(self.id, self.status, self.state))
 
 	def restart(self):
 		self.stop()
@@ -136,7 +136,7 @@ class cmd_event:
 		self.start_timer = -1
 		self.stop_timer = -1
 		self.process = None
-		self.status = '\033[31m' +  "STOPPED" + '\033[39m'
+		self.status = "STOPPED"
 		if (self.autorestart == True):
 			self.start(False)
 		elif (self.autorestart == "unexpected"):

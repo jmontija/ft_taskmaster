@@ -30,7 +30,7 @@ class task_event:
 			cmd = self.cmd[k]
 			if (line and (line == cmd.id or line == "all")):
 				find = True
-				if (cmd.status == "WAITING" or cmd.status == "FAILED"):
+				if (cmd.status == "WAITING" or cmd.status == "FAILED" or cmd.status == "STOPPED"):
 					cmd.start(False);
 					cmd.show_status()
 				elif (cmd.status == "RUNNING" or cmd.status == "STARTING"):
@@ -53,16 +53,24 @@ class task_event:
 			curr = task_lib.check_process(self.cmd, line)
 			if (curr != None):
 				curr.restart()
+				curr.show_status()
 			else:
 				print ("task: no process found " + line)
 
 	def	stop(self, line):
-		curr = task_lib.check_process(self.cmd, line)
-		if (curr != None):
-			curr.stop()
-			curr.show_status()
+		if (str(line) == "all"):
+			for k, v in self.cmd.iteritems():
+				cmd = self.cmd[k]
+				curr = task_lib.check_process(self.cmd, cmd.id)
+				if (curr != None):
+					curr.stop()
 		else:
-			print ("task: no process found " + line)
+			curr = task_lib.check_process(self.cmd, line)
+			if (curr != None):
+				curr.stop()
+				curr.show_status()
+			else:
+				print ("task: no process found " + line)
 
 	def	status(self, line):
 		if (line):
