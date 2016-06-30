@@ -12,17 +12,17 @@ programs:
       exitcodes: #
         - 0
         - 2
-        - 15
-        - 9
-      startretries: 3 #
-      starttime: 5 #
+       # - 15
+     #   - 9
+      startretries: 4 #
+      starttime: 4 #
       stopsignal: "TERM" #
-      stoptime: 10 #
+      stoptime: 5 #
       stdout: "/tmp/taskcat.stdout" #
       stderr: "/tmp/taskcat.stderr" #
 
     ls:
-      cmd: "ls -R /Applications"
+      cmd: "l -R /Applications"
       numprocs: 1
       umask: 077
       workingdir: "/tmp"

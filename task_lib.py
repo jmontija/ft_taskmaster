@@ -1,5 +1,6 @@
 import copy
 import yaml
+import logging
 from signaux import siglib
 from task_event import task_event
 
@@ -20,5 +21,7 @@ def check_process(cmd, line):
 	return (None)
 
 dup = copy.deepcopy
+log = logging
+log.basicConfig(filename = '/tmp/logger.task', level=logging.DEBUG)
 signaux = siglib()
 task = task_event()
