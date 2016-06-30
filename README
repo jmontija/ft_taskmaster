@@ -1,2 +1,4 @@
-Petites modif check les ###
+Petites modif check les ####
 Precision line_format -> 28 au lieu de 27 detail !
+logging un peu partout
+Modif de task_event __init__ c'etait mal protege

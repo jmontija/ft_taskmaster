@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    task_lib.py                                        :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: jmontija <marvin@42.fr>                    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2016/06/30 10:05:49 by jmontija          #+#    #+#              #
+#    Updated: 2016/06/30 10:05:50 by jmontija         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 import os
 import copy
 import yaml
@@ -88,8 +100,8 @@ def load_conf(file):
 		fd.close()
 		return data
 	except Exception, e:
-		print("error config -> " + file)
-		task_lib.log.warning(self.id + ': ' + self.state)
+		print("ERROR loading yaml's data -> check yourfile.yaml")
+		log.warning("ERROR loading yaml's data -> check yourfile.yaml")
 
 def check_process(cmd, line):
 	for k, v in cmd.iteritems():

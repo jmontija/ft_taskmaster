@@ -1,12 +1,25 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    cmd_lib.py                                         :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: jmontija <marvin@42.fr>                    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2016/06/30 10:05:09 by jmontija          #+#    #+#              #
+#    Updated: 2016/06/30 10:05:16 by jmontija         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 import os
 import task_lib
 
 def	post_init(cmd):
 
+	# OVER
 	if (cmd.umask > 7777):
 		cmd.state = "ERROR -> umask"
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
-	if (cmd.numprocs > 500):
+	if (cmd.numprocs > 5000):
 		cmd.state = "ERROR -> too many processus"
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 	if (cmd.workingdir[0] != "/" or os.access(cmd.workingdir, os.W_OK) == False):
@@ -34,7 +47,7 @@ def	post_init(cmd):
 	#CHECK_PATH
 	if (cmd.path[0] == '.' or cmd.path[0] == '/'):
 		if os.access(cmd.path, os.X_OK) == False:
-			cmd.state = "ERROR -> " + cmd.path
+			cmd.state = "ERROR -> command"
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 	else:
 		find = False
@@ -47,7 +60,7 @@ def	post_init(cmd):
 				find = True
 				break
 		if (find == False):
-			cmd.state = "ERROR -> " + curr_cmd
+			cmd.state = "ERROR -> command"
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 
 

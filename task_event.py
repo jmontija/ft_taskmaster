@@ -1,22 +1,38 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    task_event.py                                      :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: jmontija <marvin@42.fr>                    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2016/06/30 10:05:38 by jmontija          #+#    #+#              #
+#    Updated: 2016/06/30 10:05:40 by jmontija         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 import task_lib
 from cmd_event import cmd_event
 
 class task_event:
 
-	def __init__(self):
-		data = task_lib.load_conf("config.yaml")
-		cmd = data.get("programs")
+	def __init__(self): ####
 		self.cmd = {}
-		i = 1
-		for k, v in cmd.iteritems():
-			cmd_class = cmd_event(k, v)
-			self.cmd[k] = cmd_class
-			while (i < cmd_class.numprocs):
-				name = k + ":0" + str(i)
-				self.cmd[name] = task_lib.dup(self.cmd[k])
-				self.cmd[name].id = name
-				self.cmd[name].parent = self.cmd[k]
-				i += 1
+		try:
+			data = task_lib.load_conf("config.yaml")
+			cmd = data.get("programs")
+			for k, v in cmd.iteritems():
+				i = 1
+				cmd_class = cmd_event(k, v)
+				if (cmd_class.numprocs > 0):
+					self.cmd[k] = cmd_class
+					while (i < cmd_class.numprocs):
+						name = k + ":0" + str(i)
+						self.cmd[name] = task_lib.dup(self.cmd[k])
+						self.cmd[name].id = name
+						self.cmd[name].parent = self.cmd[k]
+						i += 1
+		except Exception, e:
+			task_lib.log.warning("ERROR loading yaml's data -> check yourfile.yaml")
 
 	def	autostart(self):
 		for k, v in self.cmd.iteritems():
@@ -35,12 +51,15 @@ class task_event:
 					cmd.show_status()
 				elif (cmd.status == "RUNNING" or cmd.status == "STARTING" or cmd.status == "STOPPING"): ####
 					print (cmd.id + " is already actived or stopping")
+					task_lib.log.warning(cmd.id + ': start failed: status:' + cmd.status)
 				else:
 					print ("FATAL_ERROR: " + cmd.id)
+					task_lib.log.warning(cmd.id + ': start failed: status:' + cmd.status)
 				if (line != "all"):
 					break
 		if (find == False):
 			print ("task: no process found " + line)
+			task_lib.log.info("start: no process found " + line)
 
 	def	restart(self, line):
 		if (str(line) == "all"):
@@ -56,6 +75,7 @@ class task_event:
 				curr.show_status()
 			else:
 				print ("task: no process running found -> check status" + line)
+				task_lib.log.info("restart: no process running found -> check status" + line)
 
 	def	stop(self, line):
 		if (str(line) == "all"):
@@ -73,6 +93,7 @@ class task_event:
 				curr.time = 0
 			else:
 				print ("task: no process running found -> check status" + line)
+				task_lib.log.info("task: no process running found -> check status" + line)
 
 	def info(self, line):
 		if (line):
@@ -80,9 +101,11 @@ class task_event:
 				cmd = self.cmd[k]
 				if (cmd.id == str(line)):
 					task_lib.print_all_info(cmd, line)
+					task_lib.log.info(cmd.id + ': info has been printed: status:' + cmd.status)
 					break
 		else:
 			print ("info requiere a target")
+			task_lib.log.info("info requiere a target")
 
 	def	status(self, line):
 		find = False
@@ -100,6 +123,7 @@ class task_event:
 				cmd.show_status()
 		if (find == False):
 			print ("task: no process found " + line)
+			task_lib.log.info("task: no process found " + line)
 
 	def reload(self):
 		task_lib.close_fd(self.cmd)
@@ -141,6 +165,7 @@ class task_event:
 
 		self.cmd = new_task.cmd
 		self.status(None)
+		task_lib.log.info('Deamon_Master: has been reloaded correctly')
 
 	def check_status(self):
 		for k, v in self.cmd.iteritems():
@@ -160,5 +185,6 @@ class task_event:
 				if (cmd.start_timer >= cmd.starttime):
 					cmd.start_timer = -1
 					cmd.status = "RUNNING"
+					task_lib.log.info(cmd.id + ': has been started: status:' + cmd.status)
 				else:
 					cmd.start_timer += 1

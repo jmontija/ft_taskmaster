@@ -4,7 +4,7 @@ programs:
 
     fail:
       cmd: "/fail"
-      numprocs: 1
+      numprocs: 4
       umask: 077
       workingdir: "/tmp"
       autostart: false
@@ -21,7 +21,7 @@ programs:
 
     cat:
       cmd: "/bin/cat"
-      numprocs: 2000
+      numprocs: 3
       umask: 644
       workingdir: "/tmp"
       autostart: false
@@ -42,7 +42,7 @@ programs:
 
     ls:
       cmd: "ls -R /"
-      numprocs: 1
+      numprocs: 3
       umask: 077
       workingdir: "/tmp"
       autostart: true
@@ -59,13 +59,14 @@ programs:
 
     wc:
       cmd: "/usr/bin/wc"
+      numprocs: 0
       umask: 077
       autostart: false
       exitcodes:
         - 0
         - 15
       startretries: 3
-      stopsignal: 15
+      stopsignal: "TERM"
       starttime: 1
       stoptime: 10
       stdout: "/tmp/taskwc.stdout"

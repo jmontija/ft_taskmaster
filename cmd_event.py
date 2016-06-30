@@ -1,3 +1,15 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    cmd_event.py                                       :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: jmontija <marvin@42.fr>                    +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2016/06/30 10:04:58 by jmontija          #+#    #+#              #
+#    Updated: 2016/06/30 10:05:00 by jmontija         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
 import os
 import time
 import shlex
@@ -16,7 +28,7 @@ class cmd_event:
 		self.state = "OK"
 		self.path = in_config(self, params, "cmd") or "/ERROR"
 		self.workingdir = in_config(self, params, "workingdir") or "/tmp"
-		self.numprocs = in_config(self, params, "numprocs") or 1
+		self.numprocs = in_config(self, params, "numprocs") or 0
 		self.stdout = in_config(self, params, "stdout") or "/tmp/task_STDOUT"
 		self.fdout = None
 		self.stderr = in_config(self, params, "stderr") or "/tmp/task_STDERR"
@@ -39,10 +51,10 @@ class cmd_event:
 		if (self.state == "OK"): cmd_lib.post_init(self)
 		if (self.state != "OK"):
 			self.status = "FATAL"
-		task_lib.log.info(self.id + ': has been create: status:' + self.status)
+		task_lib.log.info(self.id + ': has been created: status:' + self.status)
 
 	def start(self, autostart):
-		if (self.state ==  "OK"):
+		if (self.state ==  "OK" or self.state == "ERROR processus: check: /tmp/logger.task"):
 			try:
 				cmd_split = shlex.split(self.path)
 				proc = subprocess.Popen(
@@ -58,14 +70,14 @@ class cmd_event:
 				self.start_timer = 0
 				self.process = proc
 				self.time = time.time()
-				task_lib.log.info(self.id + ': ' + self.status)
+				task_lib.log.info(self.id + ': is starting: status:' + self.status)
 			except Exception, e:
 				if (self.start_fail >= self.startretries):
 					self.status = "FATAL"
 				else:
 					self.status = "FAILED"
-					self.state = "ERR processus"
-					task_lib.log.warning(self.id + ': ' + self.state)
+					self.state = "ERROR processus: check: /tmp/logger.task"
+					task_lib.log.warning(self.id + ': ' + e.strerror)
 				self.start_fail +=1
 		else:
 			self.status = "FATAL"
@@ -76,13 +88,14 @@ class cmd_event:
 		self.start_fail = 0
 		self.status = "STOPPING"
 		self.stop_timer = 0
-		task_lib.log.info(self.id + ': ' + self.status)
+		task_lib.log.info(self.id + ': is stopping: status:' + self.status)
 
 	def show_status(self):
 		task_lib.line_format(self)
 
 
 	def restart(self):
+		task_lib.log.info(self.id + ': is restarting: status:' + self.status)
 		self.stop()
 		self.start(False)
 
@@ -91,7 +104,7 @@ class cmd_event:
 		self.stop_timer = -1
 		self.process = None
 		self.status = "STOPPED"
-		task_lib.log.info(self.id + ': ' + self.status)
+		task_lib.log.info(self.id + ': has been stopped: status:' + self.status)
 		if (self.autorestart == True):
 			self.start(False)
 		elif (self.autorestart == "unexpected"):
