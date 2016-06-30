@@ -129,6 +129,7 @@ def set_env(environ_os, environ_user):
 		return final_environ
 	except:
 		print ("set_env: Err")
+		log.warning("ERROR Environnement")
 
 signaux = siglib()
 task = task_event()

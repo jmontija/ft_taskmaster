@@ -20,6 +20,7 @@ class siglib:
 		signal.signal(signal.SIGALRM, self.sig_alarm)
 		signal.signal(signal.SIGINT, self.sig_int)
 		signal.signal(signal.SIGCONT, self.sig_cont)
+		signal.signal(signal.SIGQUIT, self.sig_quit)
 		signal.alarm(5)
 
 	def get_signum(self, name):
@@ -27,11 +28,15 @@ class siglib:
 			for k, v in self.dico.iteritems():
 				if k.startswith('SIG') and not k.startswith('SIG_') and k.endswith(name):
 					return (v)
-		return (-1)
+		return (0)
+
+	def sig_quit(self ,signal, frame):
+		task_lib.log.info('SIGQUIT has been called')
+		pass
 
 	def sig_cont(self ,signal, frame):
 		task_lib.log.info('SIGCONT has been called')
-		print ("ajouter la simulation control+D") ####
+		print ("A AJOUTER: la simulation control+D") ####
 
 	def sig_int(self ,signal, frame):
 		task_lib.log.info('SIGINT has been called')

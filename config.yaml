@@ -3,20 +3,13 @@ programs:
     empty:
 
     fail:
-      cmd: "/fail"
-      numprocs: 4
+      cmd: "/bin"
       umask: 077
       workingdir: "/tmp"
-      autostart: false
-      autorestart: "unexpected"
-      exitcodes:
+      autostart: true
         - 0
-        - 2
+        - 5
       startretries: 3
-      starttime: 2
-      stopsignal: "USR1"
-      stoptime: 10
-      stdout: "/tmp/taskFAIL.stdout"
       stderr: "/tmp/taskFAIL.stderr"
 
     cat:

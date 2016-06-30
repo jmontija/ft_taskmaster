@@ -141,6 +141,7 @@ class task_event:
 							new_task.cmd[l].process = cmd.process
 							new_task.cmd[l].status = cmd.status
 							new_task.cmd[l].state = cmd.state
+							new_task.cmd[l].time = cmd.time
 							new_task.cmd[l].start_timer = cmd.start_timer
 							new_task.cmd[l].stop_timer = cmd.stop_timer
 							new_task.cmd[l].start_fail = new_task.cmd[l].start_fail

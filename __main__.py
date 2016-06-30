@@ -55,10 +55,11 @@ class keyboard(cmd.Cmd):
     def do_help(self, line):
         print ("cmd: <info/status/start/stop/restart> [all/name] || <reload/quit> ")
 
-    def do_quit(self, line):
+    def do_quit(self, line): ####
+        task.stop("all")
         close_fd(task.cmd)
         print ("see you soon on 'Deamon_Master' .\nclosing ...")
-        log.info("TASK_MASTER QUIT!")
+        log.info("TASK_MASTER CLOSED!")
         return True
 
 if __name__ == "__main__":

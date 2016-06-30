@@ -45,15 +45,15 @@ def	post_init(cmd):
 			cmd.fderr = None
 
 	#CHECK_PATH
-	if (cmd.path[0] == '.' or cmd.path[0] == '/'):
-		if os.access(cmd.path, os.X_OK) == False:
+	curr_cmd = cmd.path.split()[0]
+	if (curr_cmd[0] == '.' or curr_cmd[0] == '/'):
+		if os.access(curr_cmd, os.X_OK) == False:
 			cmd.state = "ERROR -> command"
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 	else:
 		find = False
 		path_env = os.environ["PATH"]
 		path_env = path_env.split(":")
-		curr_cmd = cmd.path.split()[0]
 		for path in path_env:
 			curr_path = path + "/" + curr_cmd
 			if os.access(curr_path, os.X_OK) == True:
@@ -72,6 +72,8 @@ def special_params(cmd, params, name):
 			return (False)
 	elif (name == "exitcodes"):
 		if (type(params[name]) is not list):
+			cmd.state = "ERROR -> " + name
+			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			return (False)
 		for exit in params[name]:
 			if ((type(exit) is int and exit < 0) or type(exit) is not int):
@@ -103,6 +105,7 @@ def check_validity(cmd, params, name):
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			return (False)
 	elif (type(params[name]) is not type_define[name]):
+		print type(params[name])
 		cmd.state = "ERROR -> " + name
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 		return (False)
