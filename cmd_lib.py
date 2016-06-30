@@ -105,7 +105,6 @@ def check_validity(cmd, params, name):
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			return (False)
 	elif (type(params[name]) is not type_define[name]):
-		print type(params[name])
 		cmd.state = "ERROR -> " + name
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 		return (False)

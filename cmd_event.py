@@ -66,6 +66,8 @@ class cmd_event:
 					env = os.environ
 				)
 				self.status = "STARTING"
+				self.state =  "OK"
+				self.start_fail = 0
 				self.stop_timer = -1
 				self.start_timer = 0
 				self.process = proc
