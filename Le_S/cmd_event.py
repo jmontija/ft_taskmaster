@@ -86,6 +86,7 @@ class cmd_event:
 		self.stop_timer = -1
 		self.time = 0
 		self.process = None
+		self.env = task_lib.set_env(os.environ, in_config(self, params, "env"))
 
 	def start(self, autostart):
 		if (self.state ==  "NOT STARTING"):
@@ -99,18 +100,19 @@ class cmd_event:
 					stdin = subprocess.PIPE,
 					stdout = stdout_path,
 					stderr = stderr_path,
-					env = os.environ
+					env = self.env
 				)
 				self.status = "STARTING"
 				self.stop_timer = -1
 				self.start_timer = 0
 				self.process = proc
+				print (str(self.env))
 			except Exception, e:
 				if (self.start_fail >= self.startretries):
 					self.status = "FATAL"
 				else:
 					self.status = "FAILED"
-				self.start_fail +=1
+				self.start_fail += 1
 		else:
 			self.status = "FATAL"
 

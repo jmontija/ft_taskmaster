@@ -20,7 +20,7 @@ programs:
       stderr: "/tmp/taskcat.stderr" #
 
     ls:
-      cmd: "ls -R /Applications"
+      cmd: "ls 64654654"
       numprocs: 1
       umask: 077
       workingdir: "/tmp"

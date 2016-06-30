@@ -63,6 +63,24 @@ def line_format(self):
 				str(self.state)))
 
 
+def set_env(environ_os, environ_user):
+	try:
+		final_environ =  copy.deepcopy(environ_os)
+		if (environ_user != None):
+			for k, v in environ_user:
+				uenv = environ_user[k]
+				for uenv in final_environ.keys():
+					final_environ[uenv] = uenv
+				del environ_user[k]
+
+		# for m, x in environ_user.iteritems():
+		# 	# final_environ[environ_user] = environ_user[m]
+		# 	final_environ.update(environ_user)
+
+
+		return final_environ
+	except:
+		print ("set_env: Err")
 
 dup = copy.deepcopy
 signaux = siglib()
