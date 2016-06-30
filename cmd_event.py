@@ -53,6 +53,39 @@ class cmd_event:
 			self.status = "FATAL"
 		task_lib.log.info(self.id + ': has been created: status:' + self.status)
 
+	def show_status(self):
+		task_lib.line_format(self)
+
+	def print_all_info(self, line):
+		try:
+			timer = time.time()
+			time_delta = time.gmtime(timer - self.time)
+			curr_time = time.strftime("%H:%M:%S", time_delta)
+			print ("_"*35 + " < " + line + " > " + "_"*35)
+			print(  "Status:              " + task_lib.format_statut(self.status))
+			print(	"State:               " + str(self.state))
+			print(	"Path:                " + str(self.path))
+			print(	"workingdir:          " + str(self.workingdir))
+			print(	"Numprocs:            " + str(self.numprocs))
+			print(	"Stdout:              " + str(self.stdout))
+			print(	"Stderr:              " + str(self.stderr))
+			print(	"Autostart:           " + str(self.autostart))
+			print(	"Autorestart:         " + str(self.autorestart))
+			print(	"Exit codes:          " + str(self.exit))
+			print(	"Stop signal:         " + str(self.stop_signal))
+			print(	"Start fail | retry:  " + str(self.start_fail) + " | " +str(self.startretries))
+			print(	"Stop time:           " + str(self.stoptime) )
+			if (self.process != None):
+				print ("_PROCESS_INFO" + "_"*((70-13 + len(line))/2))
+				print ("PID:            " + str(self.process.pid))
+				print ("Process stdin:  " + str(self.process.stdin))
+				print ("Process stdout: " + str(self.process.stdout))
+				print ("Process stderr: " + str(self.process.stderr))
+				print ("time:           " + str(curr_time))
+
+		except:
+			print ("Info: " + line + ": Failed (INFOERR)")
+
 	def start(self, autostart):
 		if (self.state ==  "OK" or self.state == "ERROR processus: check: /tmp/logger.task"):
 			try:
@@ -91,9 +124,6 @@ class cmd_event:
 		self.status = "STOPPING"
 		self.stop_timer = 0
 		task_lib.log.info(self.id + ': is stopping: status:' + self.status)
-
-	def show_status(self):
-		task_lib.line_format(self)
 
 
 	def restart(self):

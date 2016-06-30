@@ -65,7 +65,7 @@ class task_event:
 		if (str(line) == "all"):
 			for k, v in self.cmd.iteritems():
 				cmd = self.cmd[k]
-				if (cmd.process != None): ####
+				if (cmd.process != None and cmd.status != "STOPPING"): ####
 					cmd.restart()
 					cmd.show_status()
 		else:
@@ -81,7 +81,7 @@ class task_event:
 		if (str(line) == "all"):
 			for k, v in self.cmd.iteritems():
 				cmd = self.cmd[k]
-				if (cmd.process != None): ####
+				if (cmd.process != None and cmd.status != "STOPPING"): ####
 					cmd.stop()
 					cmd.show_status()
 					cmd.time = 0
@@ -100,7 +100,7 @@ class task_event:
 			for k, v in self.cmd.iteritems():
 				cmd = self.cmd[k]
 				if (cmd.id == str(line)):
-					task_lib.print_all_info(cmd, line)
+					cmd.print_all_info(line)
 					task_lib.log.info(cmd.id + ': info has been printed: status:' + cmd.status)
 					break
 		else:

@@ -67,32 +67,6 @@ def line_format(self): ####
 				format_statut(str(self.status)), \
 				str(self.state)))
 
-def print_all_info(cmd, line):
-	try:
-		print ("_"*35 + " < " + line + " > " + "_"*35)
-		print(  "Status:              " + format_statut(cmd.status))
-		print(	"State:               " + str(cmd.state))
-		print(	"Path:                " + str(cmd.path))
-		print(	"workingdir:          " + str(cmd.workingdir))
-		print(	"Numprocs:            " + str(cmd.numprocs))
-		print(	"Stdout:              " + str(cmd.stdout))
-		print(	"Stderr:              " + str(cmd.stderr))
-		print(	"Autostart:           " + str(cmd.autostart))
-		print(	"Autorestart:         " + str(cmd.autorestart))
-		print(	"Exit codes:          " + str(cmd.exit))
-		print(	"Stop signal:         " + str(cmd.stop_signal))
-		print(	"Start fail | retry:  " + str(cmd.start_fail) + " | " +str(cmd.startretries))
-		print(	"Stop time:           " + str(cmd.stoptime) )
-		if (cmd.process != None):
-			print ("_PROCESS_INFO" + "_"*((70-13 + len(line))/2))
-			print ("PID:            " + str(cmd.process.pid))
-			print ("Process stdin:  " + str(cmd.process.stdin))
-			print ("Process stdout: " + str(cmd.process.stdout))
-			print ("Process stderr: " + str(cmd.process.stderr))
-
-	except:
-		print ("Info: " + line + ": Failed (INFOERR)")
-
 def load_conf(file):
 	try:
 		fd = open(file, "r")
