@@ -21,7 +21,7 @@ programs:
 
     cat:
       cmd: "/bin/cat"
-      numprocs: 4
+      numprocs: 2000
       umask: 644
       workingdir: "/tmp"
       autostart: false
@@ -29,8 +29,8 @@ programs:
       exitcodes:
         - 0
         - 2
-       # - 15
-       # - 9
+      #  - 15
+      #  - 9
       startretries: 4
       starttime: 4
       stopsignal: "TERM"

@@ -38,19 +38,19 @@ def format_statut(line):
 	}
 	return color_string(color_match[line], line + " "*(8 - len(line)))
 
-def line_format(self):
+def line_format(self): ####
 	timer = time.time()
 	time_delta = time.gmtime(timer - self.time)
-	curr_time = time.strftime("%H:%M:%S", time_delta)
+	curr_time = time.strftime("uptime: %H:%M:%S", time_delta)
 	if (self.process):
-		print('{0:37}{1:27}{2:15}{3:23}{4:15}'.format( \
+		print('{0:37}{1:28}{2:15}{3:23}{4:15}'.format( \
 					color_string("BOLD", self.id), \
 					format_statut(self.status), \
 					"  pid ", \
 					color_string("BOLD", str(self.process.pid)), \
-					"  uptime " + str(curr_time)))
+					str(curr_time)))
 	else:
-		print('{0:24}{1:27}{2:15}'\
+		print('{0:24}{1:28}{2:15}'\
 			.format(self.id, \
 				format_statut(str(self.status)), \
 				str(self.state)))

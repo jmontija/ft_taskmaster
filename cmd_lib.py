@@ -4,16 +4,16 @@ import task_lib
 def	post_init(cmd):
 
 	if (cmd.umask > 7777):
-		cmd.state = "ERR config -> umask"
+		cmd.state = "ERROR -> umask"
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 	if (cmd.numprocs > 500):
-		cmd.state = "ERR config -> too many processus"
+		cmd.state = "ERROR -> too many processus"
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 	if (cmd.workingdir[0] != "/" or os.access(cmd.workingdir, os.W_OK) == False):
-		cmd.state = "ERR config -> wrong path"
+		cmd.state = "ERROR -> wrong path"
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 	if (cmd.stop_signal < 0 or cmd.stop_signal > 30):
-		cmd.state = "ERR config -> signaux"
+		cmd.state = "ERROR -> signaux"
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 
 	# OPEN
@@ -21,20 +21,20 @@ def	post_init(cmd):
 		try:
 			cmd.fdout = os.open(cmd.stdout, os.O_WRONLY | os.O_CREAT, cmd.umask)
 		except OSError, e:
-			cmd.state = "ERR opening -> " + e.filename
+			cmd.state = "ERROR opening -> " + e.filename
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			cmd.fdout = None
 		try:
 			cmd.fderr = os.open(cmd.stderr, os.O_WRONLY | os.O_CREAT, cmd.umask)
 		except OSError, e:
-			cmd.state = "ERR opening -> " + e.filename
+			cmd.state = "ERROR opening -> " + e.filename
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			cmd.fderr = None
 
 	#CHECK_PATH
 	if (cmd.path[0] == '.' or cmd.path[0] == '/'):
 		if os.access(cmd.path, os.X_OK) == False:
-			cmd.state = "ERR command -> " + cmd.path
+			cmd.state = "ERROR -> " + cmd.path
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 	else:
 		find = False
@@ -47,14 +47,14 @@ def	post_init(cmd):
 				find = True
 				break
 		if (find == False):
-			cmd.state = "ERR command -> " + curr_cmd
+			cmd.state = "ERROR -> " + curr_cmd
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 
 
 def special_params(cmd, params, name):
 	if (name == "autorestart"):
 		if ((type(params[name]) is int and params[name] < 0) or params[name] != "unexpected"):
-			cmd.state = "ERR config -> " + name
+			cmd.state = "ERROR -> " + name
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			return (False)
 	elif (name == "exitcodes"):
@@ -62,7 +62,7 @@ def special_params(cmd, params, name):
 			return (False)
 		for exit in params[name]:
 			if ((type(exit) is int and exit < 0) or type(exit) is not int):
-				cmd.state = "ERR config -> " + name
+				cmd.state = "ERROR -> " + name
 				task_lib.log.warning(cmd.id + ': ' + cmd.state)
 				return (False)
 	return (True)
@@ -86,11 +86,11 @@ def check_validity(cmd, params, name):
 		return (special_params(cmd, params, name))
 	elif (type(params[name]) is type_define[name]):
 		if (type_define[name] is int and params[name] < 0):
-			cmd.state = "ERR config -> " + name
+			cmd.state = "ERROR -> " + name
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			return (False)
 	elif (type(params[name]) is not type_define[name]):
-		cmd.state = "ERR config -> " + name
+		cmd.state = "ERROR -> " + name
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 		return (False)
 	return (True)
