@@ -33,10 +33,10 @@ class task_event:
 				if (cmd.status == "WAITING" or cmd.status == "FAILED" or cmd.status == "STOPPED"):
 					cmd.start(False);
 					cmd.show_status()
-				elif (cmd.status == "RUNNING" or cmd.status == "STARTING"):
-					print ("Command " + cmd.id + " is already actived")
+				elif (cmd.status == "RUNNING" or cmd.status == "STARTING" or cmd.status == "STOPPING"): ####
+					print (cmd.id + " is already actived or stopping")
 				else:
-					print ("task: FATAL_ERROR: " + cmd.id)
+					print ("FATAL_ERROR: " + cmd.id)
 				if (line != "all"):
 					break
 		if (find == False):
@@ -46,10 +46,9 @@ class task_event:
 		if (str(line) == "all"):
 			for k, v in self.cmd.iteritems():
 				cmd = self.cmd[k]
-				curr = task_lib.check_process(self.cmd, cmd.id)
-				if (curr != None):
-					curr.restart()
-					curr.show_status()
+				if (cmd.process != None): ####
+					cmd.restart()
+					cmd.show_status()
 		else:
 			curr = task_lib.check_process(self.cmd, line)
 			if (curr != None):
@@ -62,17 +61,28 @@ class task_event:
 		if (str(line) == "all"):
 			for k, v in self.cmd.iteritems():
 				cmd = self.cmd[k]
-				curr = task_lib.check_process(self.cmd, cmd.id)
-				if (curr != None):
-					curr.stop()
-					curr.show_status()
+				if (cmd.process != None): ####
+					cmd.stop()
+					cmd.show_status()
+					cmd.time = 0
 		else:
 			curr = task_lib.check_process(self.cmd, line)
 			if (curr != None):
 				curr.stop()
 				curr.show_status()
+				curr.time = 0
 			else:
 				print ("task: no process running found -> check status" + line)
+
+	def info(self, line):
+		if (line):
+			for k, v in self.cmd.iteritems():
+				cmd = self.cmd[k]
+				if (cmd.id == str(line)):
+					task_lib.print_all_info(cmd, line)
+					break
+		else:
+			print ("info requiere a target")
 
 	def	status(self, line):
 		find = False
@@ -92,6 +102,7 @@ class task_event:
 			print ("task: no process found " + line)
 
 	def reload(self):
+		task_lib.close_fd(self.cmd)
 		new_task = task_event()
 		for k, v in self.cmd.iteritems():
 			i = 0;
@@ -103,8 +114,12 @@ class task_event:
 					if (cmd.path == cmd_comp.path and cmd.stdout == cmd_comp.stdout and cmd.stderr == cmd_comp.stderr and cmd.workingdir == cmd_comp.workingdir):
 
 						if (cmd.status == "RUNNING" or cmd.status == "STARTING"):
-							cmd_comp = task_lib.dup(cmd)
-							new_task.cmd[l] = cmd_comp
+							new_task.cmd[l].process = cmd.process
+							new_task.cmd[l].status = cmd.status
+							new_task.cmd[l].state = cmd.state
+							new_task.cmd[l].start_timer = cmd.start_timer
+							new_task.cmd[l].stop_timer = cmd.stop_timer
+							new_task.cmd[l].start_fail = new_task.cmd[l].start_fail
 
 						elif (cmd.status == "WAITING" or cmd.status == "STOPPED"):
 							if (cmd_comp.autostart == True):
@@ -118,12 +133,13 @@ class task_event:
 			if (i == 0 and cmd.process):
 				cmd.stop_signal = 9
 				cmd.stop()
-		self.cmd = new_task.cmd
 
 		for a, b in new_task.cmd.iteritems():
 				cmd_comp = new_task.cmd[a]
 				if (cmd_comp.autostart == True and cmd_comp.status == "WAITING" and cmd_comp.process == None):
 					cmd_comp.start(True)
+
+		self.cmd = new_task.cmd
 		self.status(None)
 
 	def check_status(self):
@@ -137,7 +153,7 @@ class task_event:
 			elif (cmd.process and cmd.stop_timer >= 0):
 				if (cmd.stop_timer >= cmd.stoptime):
 					cmd.process.send_signal(9);
-					print (cmd.id + ": process has been killed")
+					task_lib.log.warning(cmd.id + ': has been kill due to config: stoptime')
 				else:
 					cmd.stop_timer += 1
 			elif (cmd.process and cmd.start_timer >=0):

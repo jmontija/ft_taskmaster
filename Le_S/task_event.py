@@ -1,30 +1,30 @@
 import task_lib
 from cmd_event import cmd_event
 
-def print_all_info(self, line):
+def print_all_info(cmd, line):
 	try:
 		print ("_"*35 + " < " + line + " > " + "_"*35)
-		# print   "Status:              " + task_lib.format_statut(self.status))
+		# print   "Status:              " + task_lib.format_statut(cmd.status))
 
-		# print(task_lib.format_statut(str(self.status)))
-		print(  "Status:              " + task_lib.format_statut(self.status))
-		print(	"Stats:               " + str(self.state))
-		print(	"Path:                " + str(self.path))
-		print(	"workingdir:          " + str(self.workingdir))
-		print(	"Numprocs:            " + str(self.numprocs))
-		print(	"Stdout | Stderr:     " + str(self.stdout) + " | " + str(self.stderr))
-		print(	"Autostart:           " + str(self.autostart))
-		print(	"Autorestart:         " + str(self.autorestart))
-		print(	"Exit codes:          " + str(self.exit))
-		print(	"Stop signal:         " + str(self.stop_signal))
-		print(	"Start fail | retry:  " + str(self.start_fail) + " | " +str(self.startretries))
-		print(	"Stop time:           " + str(self.stoptime) )
-		if (self.process != None):
+		# print(task_lib.format_statut(str(cmd.status)))
+		print(  "Status:              " + task_lib.format_statut(cmd.status))
+		print(	"Stats:               " + str(cmd.state))
+		print(	"Path:                " + str(cmd.path))
+		print(	"workingdir:          " + str(cmd.workingdir))
+		print(	"Numprocs:            " + str(cmd.numprocs))
+		print(	"Stdout | Stderr:     " + str(cmd.stdout) + " | " + str(cmd.stderr))
+		print(	"Autostart:           " + str(cmd.autostart))
+		print(	"Autorestart:         " + str(cmd.autorestart))
+		print(	"Exit codes:          " + str(cmd.exit))
+		print(	"Stop signal:         " + str(cmd.stop_signal))
+		print(	"Start fail | retry:  " + str(cmd.start_fail) + " | " +str(cmd.startretries))
+		print(	"Stop time:           " + str(cmd.stoptime) )
+		if (cmd.process != None):
 			print ("_PROCESS_INFO" + "_"*((70-13 + len(line))/2))
-			print ("PID:            " + str(self.process.pid))
-			print ("Process stdin:  " + str(self.process.stdin))
-			print ("Process stdout: " + str(self.process.stdout))
-			print ("Process stderr: " + str(self.process.stderr))
+			print ("PID:            " + str(cmd.process.pid))
+			print ("Process stdin:  " + str(cmd.process.stdin))
+			print ("Process stdout: " + str(cmd.process.stdout))
+			print ("Process stderr: " + str(cmd.process.stderr))
 
 
 	except:

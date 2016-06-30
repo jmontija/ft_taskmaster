@@ -1,5 +1,6 @@
 import cmd
 from task_lib import task
+from task_lib import close_fd
 
 def opening():
     try:
@@ -14,6 +15,9 @@ class keyboard(cmd.Cmd):
 
     def emptyline(self):
         pass
+
+    def do_info(self, line):
+        task.info(line)
 
     def do_status(self, line):
         task.status(line)
@@ -34,9 +38,10 @@ class keyboard(cmd.Cmd):
         task.reload()
 
     def do_help(self, line):
-        print ("cmd: <status/start/stop/restart> [all/name/pid] || <reload/quit> ")
+        print ("cmd: <info/status/start/stop/restart> [all/name] || <reload/quit> ")
 
     def do_quit(self, line):
+        close_fd(task.cmd)
         return True
 
 if __name__ == "__main__":

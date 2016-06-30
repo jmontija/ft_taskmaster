@@ -7,7 +7,7 @@ class siglib:
 		self.dico = signal.__dict__
 		signal.signal(signal.SIGALRM, self.sig_alarm)
 		signal.signal(signal.SIGINT, self.sig_int)
-		signal.alarm(10)
+		signal.alarm(5)
 
 	def get_signum(self, name):
 		if (name):

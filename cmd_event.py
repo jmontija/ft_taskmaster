@@ -3,95 +3,24 @@ import time
 import shlex
 import subprocess
 import task_lib
-
-def special_params(cmd, params, name):
-	if (name == "autorestart"):
-		if ((type(params[name]) is int and params[name] < 0) or params[name] != "unexpected"):
-			cmd.state = "ERR config -> " + name
-			return (False)
-	elif (name == "exitcodes"):
-		if (type(params[name]) is not list):
-			return (False)
-		for exit in params[name]:
-			if ((type(exit) is int and exit < 0) or type(exit) is not int):
-				cmd.state = "ERR config -> " + name
-				return (False)
-	return (True)
-
-def check_validity(cmd, params, name):
-	type_define = {
-		"cmd": str,
-		"workingdir": str,
-		"stopsignal": str,
-		"stdout": str,
-		"stderr": str,
-		"autostart": bool,
-		"starttime": int,
-		"startretries": int,
-		"stoptime": int,
-		"numprocs": int,
-		"umask": int
-	}
-	if (name == "autorestart" or name == "exitcodes"):
-		return (special_params(cmd, params, name))
-	elif (type(params[name]) is type_define[name]):
-		if (type_define[name] is int and params[name] < 0):
-			cmd.state = "ERR config -> " + name
-			return (False)
-	elif (type(params[name]) is not type_define[name]):
-		cmd.state = "ERR config -> " + name
-		return (False)
-	return (True)
-
-def in_config(cmd, params, name):
-	if (params):
-		for k, v in params.iteritems():
-			if (k == name and check_validity(cmd, params, name) == True):
-				return (params[name])
-	return None
-
-def	post_init(cmd):
-
-	if (cmd.umask > 7777): cmd.state = "ERR config -> umask"
-	if (cmd.numprocs > 500): cmd.state = "ERR config -> too many processus"
-	if (cmd.workingdir[0] != "/" or os.access(cmd.workingdir, os.W_OK) == False): cmd.state = "ERR config -> wrong path"
-	if (cmd.stop_signal < 0 or cmd.stop_signal > 30): cmd.state = "ERR config -> signaux"
-
-	# OPEN
-	try:
-		if (cmd.state == "READY"):
-			cmd.stdout = os.open(cmd.stdout, os.O_WRONLY | os.O_CREAT, cmd.umask)
-			cmd.stderr = os.open(cmd.stderr, os.O_WRONLY | os.O_CREAT, cmd.umask)
-	except OSError, e:
-		cmd.state = "ERR opening -> " + e.filename
-
-	#CHECK_PATH
-	if (cmd.path[0] == '.' or cmd.path[0] == '/'):
-		if os.access(cmd.path, os.X_OK) == False:
-			cmd.state = "ERR command -> " + cmd.path
-	else:
-		find = False
-		path_env = os.environ["PATH"]
-		path_env = path_env.split(":")
-		curr_cmd = cmd.path.split()[0]
-		for path in path_env:
-			curr_path = path + "/" + curr_cmd
-			if os.access(curr_path, os.X_OK) == True:
-				find = True
-				break
-		if (find == False): cmd.state = "ERR command -> " + curr_cmd
+import cmd_lib
 
 class cmd_event:
 
 	def __init__(self, key, params):
+
+		in_config = cmd_lib.in_config
+
 		self.id = key
 		self.status = "WAITING"
-		self.state = "READY"
+		self.state = "OK"
 		self.path = in_config(self, params, "cmd") or "/ERROR"
 		self.workingdir = in_config(self, params, "workingdir") or "/tmp"
 		self.numprocs = in_config(self, params, "numprocs") or 1
 		self.stdout = in_config(self, params, "stdout") or "/tmp/task_STDOUT"
+		self.fdout = None
 		self.stderr = in_config(self, params, "stderr") or "/tmp/task_STDERR"
+		self.fderr = None
 		self.autostart = in_config(self, params, "autostart")
 		self.autorestart = in_config(self, params, "autorestart") or "unexpected"
 		self.exit = in_config(self, params, "exitcodes") or [0, 2]
@@ -105,34 +34,38 @@ class cmd_event:
 		self.stop_timer = -1
 		self.time = 0
 		self.process = None
+		self.env = task_lib.set_env(os.environ, in_config(self, params, "env"))
 
-		if (self.state == "READY"): post_init(self)
-		if (self.state != "READY"):
+		if (self.state == "OK"): cmd_lib.post_init(self)
+		if (self.state != "OK"):
 			self.status = "FATAL"
-			log.warning(self.id + ': ' + self.state)
+		task_lib.log.info(self.id + ': has been create: status:' + self.status)
 
 	def start(self, autostart):
-		if (self.state ==  "READY"):
+		if (self.state ==  "OK"):
 			try:
 				cmd_split = shlex.split(self.path)
 				proc = subprocess.Popen(
 					cmd_split,
 					cwd = self.workingdir,
 					stdin = subprocess.PIPE,
-					stdout = self.stdout,
-					stderr = self.stderr,
+					stdout = self.fdout,
+					stderr = self.fderr,
 					env = os.environ
 				)
 				self.status = "STARTING"
 				self.stop_timer = -1
 				self.start_timer = 0
 				self.process = proc
+				self.time = time.time()
+				task_lib.log.info(self.id + ': ' + self.status)
 			except Exception, e:
 				if (self.start_fail >= self.startretries):
 					self.status = "FATAL"
 				else:
 					self.status = "FAILED"
 					self.state = "ERR processus"
+					task_lib.log.warning(self.id + ': ' + self.state)
 				self.start_fail +=1
 		else:
 			self.status = "FATAL"
@@ -143,17 +76,11 @@ class cmd_event:
 		self.start_fail = 0
 		self.status = "STOPPING"
 		self.stop_timer = 0
+		task_lib.log.info(self.id + ': ' + self.status)
 
 	def show_status(self):
-		# task_lib.line_format(self)
-		# if (self.process):
-		# 	print('{0:28}{1:24}{2:15}{3:23}{4:15}'.format('\033[1m' + self.id +'\033[0m', '\033[92m'+ self.status + '\033[0m', "  pid ", '\033[1m' + str(self.process.pid) + '\033[0m', "  uptime ", str(self.time)))
-		# else:
-		# 	print('{0:20}{1:25}{2:15}'.format(self.id, self.status, self.state))
-		if (self.process):
-			print('{0:28}{1:24}{2:15}{3:23}{4:15}'.format('\033[1m' + self.id +'\033[0m', '\033[92m'+ self.status + '\033[0m', "  pid ", '\033[1m' + str(self.process.pid) + '\033[0m', "  uptime ", str(self.time)))
-		else:
-			print('{0:20}{1:15}{2:15}'.format(self.id, self.status, self.state))
+		task_lib.line_format(self)
+
 
 	def restart(self):
 		self.stop()
@@ -164,6 +91,7 @@ class cmd_event:
 		self.stop_timer = -1
 		self.process = None
 		self.status = "STOPPED"
+		task_lib.log.info(self.id + ': ' + self.status)
 		if (self.autorestart == True):
 			self.start(False)
 		elif (self.autorestart == "unexpected"):

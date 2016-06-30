@@ -2,31 +2,50 @@ programs:
 
     empty:
 
-    cat:
-      cmd: "/bin/cat" #
-      numprocs: 4 #
-      umask: 644 #
-      workingdir: "/tmp" #
-      autostart: false #
-      autorestart: "unexpected" #
-      exitcodes: #
-        - 0
-        - 2
-       # - 15
-     #   - 9
-      startretries: 4 #
-      starttime: 4 #
-      stopsignal: "TERM" #
-      stoptime: 5 #
-      stdout: "/tmp/taskcat.stdout" #
-      stderr: "/tmp/taskcat.stderr" #
-
-    ls:
-      cmd: "l -R /Applications"
+    fail:
+      cmd: "/fail"
       numprocs: 1
       umask: 077
       workingdir: "/tmp"
       autostart: false
+      autorestart: "unexpected"
+      exitcodes:
+        - 0
+        - 2
+      startretries: 3
+      starttime: 2
+      stopsignal: "USR1"
+      stoptime: 10
+      stdout: "/tmp/taskFAIL.stdout"
+      stderr: "/tmp/taskFAIL.stderr"
+
+    cat:
+      cmd: "/bin/cat"
+      numprocs: 4
+      umask: 644
+      workingdir: "/tmp"
+      autostart: false
+      autorestart: "unexpected"
+      exitcodes:
+        - 0
+        - 2
+       # - 15
+       # - 9
+      startretries: 4
+      starttime: 4
+      stopsignal: "TERM"
+      stoptime: 5
+      stdout: "/tmp/taskcat.stdout"
+      stderr: "/tmp/taskcat.stderr"
+      env:
+          HOME: "/HOME"
+
+    ls:
+      cmd: "ls -R /"
+      numprocs: 1
+      umask: 077
+      workingdir: "/tmp"
+      autostart: true
       autorestart: "unexpected"
       exitcodes:
         - 0
@@ -50,20 +69,3 @@ programs:
       starttime: 1
       stoptime: 10
       stdout: "/tmp/taskwc.stdout"
-
-    fail:
-      cmd: "/fail"
-      numprocs: 1
-      umask: 077
-      workingdir: "/tmp"
-      autostart: false
-      autorestart: "unexpected"
-      exitcodes:
-        - 0
-        - 2
-      startretries: 3
-      starttime: 2
-      stopsignal: "USR1"
-      stoptime: 10
-      stdout: "/tmp/taskFAIL.stdout"
-      stderr: "/tmp/taskFAIL.stderr"
