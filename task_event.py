@@ -11,6 +11,7 @@
 # **************************************************************************** #
 
 import task_lib
+import sys
 from cmd_event import cmd_event
 
 class task_event:
@@ -18,7 +19,7 @@ class task_event:
 	def __init__(self): ####
 		self.cmd = {}
 		try:
-			data = task_lib.load_conf("config.yaml")
+			data = task_lib.load_conf(str(sys.argv[1]))
 			cmd = data.get("programs")
 			for k, v in cmd.iteritems():
 				i = 1
@@ -63,36 +64,42 @@ class task_event:
 
 	def	restart(self, line):
 		if (str(line) == "all"):
+			find = False
 			for k, v in self.cmd.iteritems():
 				cmd = self.cmd[k]
-				if (cmd.process != None and cmd.status != "STOPPING"): ####
+				if (cmd.process != None): ####
+					find = True
 					cmd.restart()
 					cmd.show_status()
+			if (find == False): print ("task: no process running found -> check status " + line)
 		else:
 			curr = task_lib.check_process(self.cmd, line)
 			if (curr != None):
 				curr.restart()
 				curr.show_status()
 			else:
-				print ("task: no process running found -> check status" + line)
-				task_lib.log.info("restart: no process running found -> check status" + line)
+				print ("task: no process running found -> check status")
+				task_lib.log.info("restart: no process running found -> check status " + line)
 
 	def	stop(self, line):
 		if (str(line) == "all"):
+			find = False
 			for k, v in self.cmd.iteritems():
 				cmd = self.cmd[k]
 				if (cmd.process != None and cmd.status != "STOPPING"): ####
+					find = True
 					cmd.stop()
 					cmd.show_status()
 					cmd.time = 0
+			if (find == False): print ("task: no process running found -> check status")
 		else:
 			curr = task_lib.check_process(self.cmd, line)
-			if (curr != None):
+			if (curr != None and cmd.status != "STOPPING"):
 				curr.stop()
 				curr.show_status()
 				curr.time = 0
 			else:
-				print ("task: no process running found -> check status" + line)
+				print ("task: no process running found -> check status " + line)
 				task_lib.log.info("task: no process running found -> check status" + line)
 
 	def info(self, line):

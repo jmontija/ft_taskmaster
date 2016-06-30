@@ -21,7 +21,7 @@ class siglib:
 		signal.signal(signal.SIGINT, self.sig_int)
 		signal.signal(signal.SIGCONT, self.sig_cont)
 		signal.signal(signal.SIGQUIT, self.sig_quit)
-		signal.alarm(5)
+		signal.alarm(1)
 
 	def get_signum(self, name):
 		if (name):

@@ -14,6 +14,7 @@ import os
 import copy
 import yaml
 import time
+import datetime
 import logging
 from signaux import siglib
 from task_event import task_event
@@ -21,6 +22,7 @@ from task_event import task_event
 dup = copy.deepcopy
 log = logging
 log.basicConfig(filename = '/tmp/logger.task', level=logging.DEBUG)
+log.info(("\t\n\n" + str(datetime.datetime.now()) + '\n'))
 
 def color_string(line, s):
 	color_define = {
