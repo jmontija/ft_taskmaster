@@ -117,7 +117,7 @@ class cmd_event:
 		else:
 			self.status = "FATAL"
 
-	def stop(self):
+	def stop(self):	
 		self.process.send_signal(self.stop_signal)
 		self.start_timer = -1
 		self.start_fail = 0

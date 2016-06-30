@@ -7,8 +7,6 @@ programs:
       umask: 077
       workingdir: "/tmp"
       autostart: true
-        - 0
-        - 5
       startretries: 3
       stderr: "/tmp/taskFAIL.stderr"
 
@@ -39,7 +37,7 @@ programs:
       umask: 077
       workingdir: "/tmp"
       autostart: true
-      autorestart: "unexpected"
+      autorestart: true
       exitcodes:
         - 0
         - 2
@@ -54,7 +52,7 @@ programs:
       cmd: "/usr/bin/wc"
       numprocs: 0
       umask: 077
-      autostart: false
+      autorestart: "djkdd"
       exitcodes:
         - 0
         - 15

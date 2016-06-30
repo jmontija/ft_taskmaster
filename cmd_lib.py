@@ -66,7 +66,7 @@ def	post_init(cmd):
 
 def special_params(cmd, params, name):
 	if (name == "autorestart"):
-		if ((type(params[name]) is int and params[name] < 0) or params[name] != "unexpected"):
+		if ((type(params[name]) is not bool) and params[name] != "unexpected"):
 			cmd.state = "ERROR -> " + name
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			return (False)
