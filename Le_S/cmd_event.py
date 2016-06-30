@@ -35,6 +35,7 @@ def check_validity(cmd, params, name):
 		"startretries": int,
 		"stoptime": int,
 		"numprocs": int,
+		"env": dict,
 	}
 	if (name == "autorestart" or name == "exitcodes"):
 		return (special_params(cmd, params, name))
@@ -86,7 +87,8 @@ class cmd_event:
 		self.stop_timer = -1
 		self.time = 0
 		self.process = None
-		self.env = task_lib.set_env(os.environ, in_config(self, params, "env"))
+		oenv = os.environ
+		self.env = task_lib.set_env(oenv, in_config(self, params, "env"))
 
 	def start(self, autostart):
 		if (self.state ==  "NOT STARTING"):
@@ -106,7 +108,6 @@ class cmd_event:
 				self.stop_timer = -1
 				self.start_timer = 0
 				self.process = proc
-				print (str(self.env))
 			except Exception, e:
 				if (self.start_fail >= self.startretries):
 					self.status = "FATAL"

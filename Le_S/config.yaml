@@ -18,9 +18,12 @@ programs:
       stoptime: 10 #
       stdout: "/tmp/taskcat.stdout" #
       stderr: "/tmp/taskcat.stderr" #
+      env:
+          HOME: "/"
+          sisi: "94"
 
     ls:
-      cmd: "ls 64654654"
+      cmd: "ls -R /Applications"
       numprocs: 1
       umask: 077
       workingdir: "/tmp"
