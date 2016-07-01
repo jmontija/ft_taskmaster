@@ -34,11 +34,7 @@ class cmd_event:
 		self.stderr = in_config(self, params, "stderr") or "/tmp/task_STDERR"
 		self.fderr = None
 		self.autostart = in_config(self, params, "autostart") or False
-<<<<<<< HEAD
 		self.autorestart = in_config(self, params, "autorestart") or False
-=======
-		self.autorestart = in_config(self, params, "autorestart") or task_lib.color_string("RED","unexpected")
->>>>>>> b4c658d83908d57b69b2da8d3f42dd280bde6fe2
 		self.exit = in_config(self, params, "exitcodes") or [0, 2]
 		self.starttime = in_config(self, params, "starttime") or 1
 		self.start_timer = -1
@@ -57,39 +53,6 @@ class cmd_event:
 			self.status = "FATAL"
 		task_lib.log.info(self.id + ': has been created: status:' + self.status)
 
-	def show_status(self):
-		task_lib.line_format(self)
-
-	def print_all_info(self, line):
-		try:
-			timer = time.time()
-			time_delta = time.gmtime(timer - self.time)
-			curr_time = time.strftime("%H:%M:%S", time_delta)
-			print ("_"*35 + " < " + line + " > " + "_"*35)
-			print(  "Status:              " + task_lib.format_statut(self.status))
-			print(	"State:               " + str(self.state))
-			print(	"Path:                " + str(self.path))
-			print(	"workingdir:          " + str(self.workingdir))
-			print(	"Numprocs:            " + str(self.numprocs))
-			print(	"Stdout:              " + str(self.stdout))
-			print(	"Stderr:              " + str(self.stderr))
-			print(	"Autostart:           " + str(self.autostart))
-			print(	"Autorestart:         " + str(self.autorestart))
-			print(	"Exit codes:          " + str(self.exit))
-			print(	"Stop signal:         " + str(self.stop_signal))
-			print(	"Start fail | retry:  " + str(self.start_fail) + " | " +str(self.startretries))
-			print(	"Stop time:           " + str(self.stoptime) )
-			if (self.process != None):
-				print ("_PROCESS_INFO" + "_"*((70-13 + len(line))/2))
-				print ("PID:            " + str(self.process.pid))
-				print ("Process stdin:  " + str(self.process.stdin))
-				print ("Process stdout: " + str(self.process.stdout))
-				print ("Process stderr: " + str(self.process.stderr))
-				print ("time:           " + str(curr_time))
-
-		except:
-			print ("Info: " + line + ": Failed (INFOERR)")
-
 	def start(self, autostart):
 		if (self.state ==  "OK" or self.state == "ERROR processus: check: /tmp/logger.task"):
 			try:
@@ -103,8 +66,6 @@ class cmd_event:
 					env = self.env
 				)
 				self.status = "STARTING"
-				self.state =  "OK"
-				self.start_fail = 0
 				self.stop_timer = -1
 				self.start_timer = 0
 				self.process = proc
@@ -115,9 +76,9 @@ class cmd_event:
 					self.status = "FATAL"
 				else:
 					self.status = "FAILED"
-					self.state = task_lib.color_string("RED", "ERROR processus: check: /tmp/logger.task")
+					self.state = "ERROR processus: check: /tmp/logger.task"
 					task_lib.log.warning(self.id + ': ' + e.strerror)
-				self.start_fail += 1
+				self.start_fail +=1
 		else:
 			self.status = "FATAL"
 
@@ -132,6 +93,9 @@ class cmd_event:
 		except OSError, e:
 			task_lib.log.warning(self.id + ': ' + e.strerror)
 			self.finish(15)
+
+	def show_status(self):
+		task_lib.line_format(self)
 
 
 	def restart(self):

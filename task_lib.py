@@ -14,7 +14,6 @@ import os
 import copy
 import yaml
 import time
-import datetime
 import logging
 from signaux import siglib
 from task_event import task_event
@@ -22,17 +21,11 @@ from task_event import task_event
 dup = copy.deepcopy
 log = logging
 log.basicConfig(filename = '/tmp/logger.task', level=logging.DEBUG)
-log.info(("\t\n\n" + str(datetime.datetime.now()) + '\n'))
-
 
 def color_string(line, s):
 	color_define = {
 		"BOLD": "\033[1m" + s + "\033[0m" + "\033[39m",
-<<<<<<< HEAD
 		"RED": "\033[31m" + s +  "\033[39m"  + " ",
-=======
-		"RED": "\033[31m" + s +  "\033[39m" +" ",
->>>>>>> b4c658d83908d57b69b2da8d3f42dd280bde6fe2
 		"GREEN": "\033[32m" + s + "\033[39m",
 		"YELLOW": "\033[33m" + s + "\033[39m",
 		"BLUE": "\033[34m" + s + "\033[39m",
@@ -77,7 +70,6 @@ def line_format(self): ####
 				format_statut(self.status) + " "*(Get_max_flow() - len(format_statut(self.status))), \
 				str(self.state)))
 
-<<<<<<< HEAD
 def print_all_info(cmd, line):
 	try:
 		timer = time.time()
@@ -109,8 +101,6 @@ def print_all_info(cmd, line):
 	except:
 		print ("Info: " + line + ": Failed (INFOERR)")
 
-=======
->>>>>>> b4c658d83908d57b69b2da8d3f42dd280bde6fe2
 def load_conf(file):
 	try:
 		fd = open(file, "r")
