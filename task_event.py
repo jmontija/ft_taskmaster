@@ -126,6 +126,16 @@ class task_event:
 			print ("task: no process found " + line)
 			task_lib.log.info("task: no process found " + line)
 
+	def only(self, line):
+		find = False
+		for k, v in self.cmd.iteritems():
+			cmd = self.cmd[k]
+			if (cmd.status == line):
+				find = True
+				cmd.show_status()
+		if (find == False):
+			print ("No matched status")
+
 	def reload(self):
 		task_lib.close_fd(self.cmd)
 		new_task = task_event()

@@ -52,6 +52,9 @@ class keyboard(cmd.Cmd):
     def do_reload(self, line):
         task.reload()
 
+    def do_only(self, line):
+        task.only(line)
+
     def do_help(self, line):
         print ("cmd: <info/status/start/stop/restart> [all/name] || <reload/quit> ")
 
