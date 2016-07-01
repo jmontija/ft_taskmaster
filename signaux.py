@@ -11,7 +11,7 @@
 # **************************************************************************** #
 
 import signal
-import task_libls
+import task_lib
 
 class siglib:
 

@@ -1,12 +1,15 @@
 programs:
 
     empty:
+      cmd: "ls -l"
+      autorestart: False
+      exitcodes: 0
 
     fail:
       cmd: "/bin/ls -R /Application"
       umask: 022
       workingdir: "/tmp"
-      autostart: 8
+      autostart: True
       startretries: 3
       stderr: "/tmp/taskFAIL.stderr"
 
@@ -21,7 +24,6 @@ programs:
         - 0
         - 2
         - 15
-      #  - 9
       startretries: 4
       starttime: 4
       stopsignal: "TERM"
@@ -53,6 +55,7 @@ programs:
       numprocs: 1
       umask: 022
       autostart: false
+      autorestart: true
       exitcodes:
         - 0
         - 15

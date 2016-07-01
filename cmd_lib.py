@@ -76,7 +76,9 @@ def special_params(cmd, params, name):
 			return (False)
 		return (params[name])
 	elif (name == "exitcodes"):
-		if (type(params[name]) is not list):
+		if (type(params[name]) is int and params[name] == 0):
+			return (False)
+		elif (type(params[name]) is not list):
 			cmd.state = task_lib.color_string("RED", "ERROR -> " + name)
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			return (False)
