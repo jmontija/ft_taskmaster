@@ -172,11 +172,7 @@ class task_event:
 	def check_status(self):
 		for k, v in self.cmd.iteritems():
 			cmd = self.cmd[k]
-			if (cmd.id == "empty"):
-				print (cmd.process, cmd.status)
-				if (cmd.process):
-					print (cmd.process.poll())
-			if (cmd.process and cmd.process.poll()):
+			if (cmd.process and cmd.process.poll() != None):
 				sig_num = cmd.process.returncode
 				if (sig_num < 0):
 					sig_num *= -1

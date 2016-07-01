@@ -17,16 +17,16 @@ def	post_init(cmd):
 
 	# OVER
 	if (cmd.umask > 7777):
-		cmd.state = "ERROR -> umask"
+		cmd.state = task_lib.color_string("RED", "ERROR -> umask")
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 	if (cmd.numprocs > 5000):
-		cmd.state = "ERROR -> too many processus"
+		cmd.state = task_lib.color_string("RED", "ERROR -> too many processus")
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 	if (cmd.workingdir[0] != "/" or os.access(cmd.workingdir, os.W_OK) == False):
-		cmd.state = "ERROR -> wrong path"
+		cmd.state = task_lib.color_string("RED", "ERROR -> path")
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 	if (cmd.stop_signal < 0 or cmd.stop_signal > 30):
-		cmd.state = "ERROR -> signaux"
+		cmd.state = task_lib.color_string("RED", "ERROR -> signaux")
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 
 	# OPEN
@@ -36,12 +36,14 @@ def	post_init(cmd):
 			cmd.fdout = os.open(cmd.stdout, os.O_WRONLY | os.O_CREAT, 644)
 		except OSError, e:
 			cmd.state = "ERROR opening -> " + e.filename
+			cmd.stdout = task_lib.color_string("RED", str(cmd.stdout))
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			cmd.fdout = None
 		try:
 			cmd.fderr = os.open(cmd.stderr, os.O_WRONLY | os.O_CREAT, 644)
 		except OSError, e:
 			cmd.state = "ERROR opening -> " + e.filename
+			cmd.stderr = task_lib.color_string("RED", str(cmd.stderr))
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			cmd.fderr = None
 		os.umask(oldmask)
@@ -104,11 +106,11 @@ def check_validity(cmd, params, name):
 		return (special_params(cmd, params, name))
 	elif (type(params[name]) is type_define[name]):
 		if (type_define[name] is int and params[name] < 0):
-			cmd.state = "ERROR -> " + name
+			cmd.state = task_lib.color_string("RED", "ERROR -> " + name)
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			return (False)
 	elif (type(params[name]) is not type_define[name]):
-		cmd.state = "ERROR -> " + name
+		cmd.state = task_lib.color_string("RED", "ERROR -> " + name)
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 		return (False)
 	return (True)

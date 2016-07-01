@@ -25,7 +25,7 @@ log.basicConfig(filename = '/tmp/logger.task', level=logging.DEBUG)
 def color_string(line, s):
 	color_define = {
 		"BOLD": "\033[1m" + s + "\033[0m" + "\033[39m",
-		"RED": "\033[31m" + s +  "\033[39m"  + " ",
+		"RED": "\033[31m" + s +  "\033[39m"  + "            ",
 		"GREEN": "\033[32m" + s + "\033[39m",
 		"YELLOW": "\033[33m" + s + "\033[39m",
 		"BLUE": "\033[34m" + s + "\033[39m",

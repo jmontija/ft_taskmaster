@@ -1,13 +1,13 @@
 programs:
 
     empty:
-      cmd: "pwd"
+      cmd: "dffsd"
 
     fail:
       cmd: "/bin/ls -R /Application"
       umask: 022
       workingdir: "/tmp"
-      autostart: true
+      autostart: 8
       startretries: 3
       stderr: "/tmp/taskFAIL.stderr"
 
