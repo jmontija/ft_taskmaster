@@ -10,6 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
+import sys
 import task_lib
 from cmd_event import cmd_event
 
@@ -18,7 +19,7 @@ class task_event:
 	def __init__(self): ####
 		self.cmd = {}
 		try:
-			data = task_lib.load_conf("config.yaml")
+			data = task_lib.load_conf(sys.argv[1])
 			cmd = data.get("programs")
 			for k, v in cmd.iteritems():
 				i = 1
@@ -171,6 +172,10 @@ class task_event:
 	def check_status(self):
 		for k, v in self.cmd.iteritems():
 			cmd = self.cmd[k]
+			if (cmd.id == "empty"):
+				print (cmd.process, cmd.status)
+				if (cmd.process):
+					print (cmd.process.poll())
 			if (cmd.process and cmd.process.poll()):
 				sig_num = cmd.process.returncode
 				if (sig_num < 0):
@@ -178,7 +183,11 @@ class task_event:
 				cmd.finish(sig_num);
 			elif (cmd.process and cmd.stop_timer >= 0):
 				if (cmd.stop_timer >= cmd.stoptime):
-					cmd.process.send_signal(9);
+					try:
+						cmd.process.send_signal(9);
+						cmd.finish(9);
+					except OSError, e:
+						task_lib.log.warning(cmd.id + ': stoptime')
 					task_lib.log.warning(cmd.id + ': has been kill due to config: stoptime')
 				else:
 					cmd.stop_timer += 1
@@ -189,3 +198,5 @@ class task_event:
 					task_lib.log.info(cmd.id + ': has been started: status:' + cmd.status)
 				else:
 					cmd.start_timer += 1
+			elif (cmd.process == None and cmd.status == "RUNNING"):
+				cmd.finish(0);

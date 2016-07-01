@@ -26,23 +26,23 @@ class cmd_event:
 		self.id = key
 		self.status = "WAITING"
 		self.state = "OK"
-		self.path = in_config(self, params, "cmd") or "/ERROR"
+		self.path = in_config(self, params, "cmd") or task_lib.color_string("RED","Empty")
 		self.workingdir = in_config(self, params, "workingdir") or "/tmp"
-		self.numprocs = in_config(self, params, "numprocs") or 1 #0
+		self.numprocs = in_config(self, params, "numprocs") or 1
 		self.stdout = in_config(self, params, "stdout") or "/tmp/task_STDOUT"
 		self.fdout = None
 		self.stderr = in_config(self, params, "stderr") or "/tmp/task_STDERR"
 		self.fderr = None
 		self.autostart = in_config(self, params, "autostart") or False
-		self.autorestart = in_config(self, params, "autorestart") or "unexpected"
+		self.autorestart = in_config(self, params, "autorestart") or False
 		self.exit = in_config(self, params, "exitcodes") or [0, 2]
 		self.starttime = in_config(self, params, "starttime") or 1
 		self.start_timer = -1
 		self.startretries = in_config(self, params, "startretries") or 3
 		self.start_fail = 0
 		self.stop_signal = task_lib.signaux.get_signum(in_config(self, params, "stopsignal")) or 15
-		self.stoptime = in_config(self, params, "stoptime") or 10
-		self.umask = in_config(self, params, "umask") or 644
+		self.stoptime = in_config(self, params, "stoptime") or 1
+		self.umask = in_config(self, params, "umask") or 022
 		self.stop_timer = -1
 		self.time = 0
 		self.process = None
@@ -63,7 +63,7 @@ class cmd_event:
 					stdin = subprocess.PIPE,
 					stdout = self.fdout,
 					stderr = self.fderr,
-					env = os.environ
+					env = self.env
 				)
 				self.status = "STARTING"
 				self.stop_timer = -1
@@ -83,12 +83,16 @@ class cmd_event:
 			self.status = "FATAL"
 
 	def stop(self):
-		self.process.send_signal(self.stop_signal)
 		self.start_timer = -1
 		self.start_fail = 0
-		self.status = "STOPPING"
 		self.stop_timer = 0
+		self.status = "STOPPING"
 		task_lib.log.info(self.id + ': is stopping: status:' + self.status)
+		try:
+			self.process.send_signal(self.stop_signal)
+		except OSError, e:
+			task_lib.log.warning(self.id + ': ' + e.strerror)
+			self.finish(15)
 
 	def show_status(self):
 		task_lib.line_format(self)
@@ -102,8 +106,8 @@ class cmd_event:
 	def finish(self, signum):
 		self.start_timer = -1
 		self.stop_timer = -1
-		self.process = None
 		self.status = "STOPPED"
+		self.process = None
 		task_lib.log.info(self.id + ': has been stopped: status:' + self.status)
 		if (self.autorestart == True):
 			self.start(False)

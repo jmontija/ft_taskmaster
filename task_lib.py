@@ -25,14 +25,14 @@ log.basicConfig(filename = '/tmp/logger.task', level=logging.DEBUG)
 def color_string(line, s):
 	color_define = {
 		"BOLD": "\033[1m" + s + "\033[0m" + "\033[39m",
-		"RED": "\033[31m" + s +  "\033[39m",
+		"RED": "\033[31m" + s +  "\033[39m"  + " ",
 		"GREEN": "\033[32m" + s + "\033[39m",
 		"YELLOW": "\033[33m" + s + "\033[39m",
 		"BLUE": "\033[34m" + s + "\033[39m",
 		"MAGENTA": "\033[35m" + s + "\033[39m",
 		"CYAN": "\033[36m" + s + "\033[39m",
-		"BACK_YEL" : "\033[43m" + "\033[1m" "\033[30m" + s + "\033[0m" + "\033[39m" + "\t   ",
-		"BACK_RED": "\033[41m" + "\033[1m" + s + "\033[0m" + "\033[39m" + "\t   ",
+		"BACK_YEL" : "\033[43m" + "\033[1m" "\033[30m" + s + "\033[0m" + "\033[39m" + "\t    ",
+		"BACK_RED": "\033[41m" + "\033[1m" + s + "\033[0m" + "\033[39m" + "\t    ",
 		"DEFAULT" : "\033[0m" + "\033[39m" + s,
 	}
 	return str(color_define[line])
@@ -50,6 +50,9 @@ def format_statut(line):
 	}
 	return color_string(color_match[line], line + " "*(8 - len(line)))
 
+def Get_max_flow():
+	return len (color_string("GREEN", "STARTING"))
+
 def line_format(self): ####
 	timer = time.time()
 	time_delta = time.gmtime(timer - self.time)
@@ -57,21 +60,25 @@ def line_format(self): ####
 	if (self.process):
 		print('{0:37}{1:28}{2:15}{3:23}{4:15}'.format( \
 					color_string("BOLD", self.id), \
-					format_statut(self.status), \
+					format_statut(self.status) + " "*(Get_max_flow() - len(format_statut(self.status))), \
 					"  pid ", \
 					color_string("BOLD", str(self.process.pid)), \
 					str(curr_time)))
 	else:
-		print('{0:24}{1:28}{2:15}'\
+		print('{0:24}{1:29}{2:15}'\
 			.format(self.id, \
-				format_statut(str(self.status)), \
+				format_statut(self.status) + " "*(Get_max_flow() - len(format_statut(self.status))), \
 				str(self.state)))
 
 def print_all_info(cmd, line):
 	try:
+		timer = time.time()
+		time_delta = time.gmtime(timer - cmd.time)
+		curr_time = time.strftime("%H:%M:%S", time_delta)
 		print ("_"*35 + " < " + line + " > " + "_"*35)
 		print(  "Status:              " + format_statut(cmd.status))
 		print(	"State:               " + str(cmd.state))
+		print(	"umask:               " + str(cmd.umask) )
 		print(	"Path:                " + str(cmd.path))
 		print(	"workingdir:          " + str(cmd.workingdir))
 		print(	"Numprocs:            " + str(cmd.numprocs))
@@ -89,6 +96,7 @@ def print_all_info(cmd, line):
 			print ("Process stdin:  " + str(cmd.process.stdin))
 			print ("Process stdout: " + str(cmd.process.stdout))
 			print ("Process stderr: " + str(cmd.process.stderr))
+			print ("time:           " + str(curr_time))
 
 	except:
 		print ("Info: " + line + ": Failed (INFOERR)")

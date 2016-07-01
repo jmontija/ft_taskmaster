@@ -9,7 +9,7 @@
 #    Updated: 2016/06/30 10:04:20 by jmontija         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
-
+import signal
 import cmd
 from task_lib import task
 from task_lib import close_fd
@@ -56,8 +56,9 @@ class keyboard(cmd.Cmd):
         print ("cmd: <info/status/start/stop/restart> [all/name] || <reload/quit> ")
 
     def do_quit(self, line): ####
-        task.stop("all")
+        signal.alarm(0)
         close_fd(task.cmd)
+        task.stop("all")
         print ("see you soon on 'Deamon_Master' .\nclosing ...")
         log.info("TASK_MASTER CLOSED!")
         return True

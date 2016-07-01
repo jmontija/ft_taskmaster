@@ -1,28 +1,27 @@
 programs:
 
     empty:
+      cmd: "pwd"
 
     fail:
-      cmd: "/bin"
-      umask: 077
+      cmd: "/bin/ls -R /Application"
+      umask: 022
       workingdir: "/tmp"
       autostart: true
-        - 0
-        - 5
       startretries: 3
       stderr: "/tmp/taskFAIL.stderr"
 
     cat:
       cmd: "/bin/cat"
-      numprocs: 3
-      umask: 644
+      numprocs: 5
+      umask: 077
       workingdir: "/tmp"
       autostart: false
-      autorestart: "unexpected"
+      autorestart: True
       exitcodes:
         - 0
         - 2
-      #  - 15
+        - 15
       #  - 9
       startretries: 4
       starttime: 4
@@ -36,9 +35,9 @@ programs:
     ls:
       cmd: "ls -R /"
       numprocs: 3
-      umask: 077
+      umask: 022
       workingdir: "/tmp"
-      autostart: true
+      autostart: False
       autorestart: "unexpected"
       exitcodes:
         - 0
@@ -52,8 +51,8 @@ programs:
 
     wc:
       cmd: "/usr/bin/wc"
-      numprocs: 0
-      umask: 077
+      numprocs: 1
+      umask: 022
       autostart: false
       exitcodes:
         - 0

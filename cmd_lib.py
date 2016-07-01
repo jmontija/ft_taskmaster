@@ -31,24 +31,26 @@ def	post_init(cmd):
 
 	# OPEN
 	if (cmd.state == "OK"):
+		oldmask = os.umask(cmd.umask)
 		try:
-			cmd.fdout = os.open(cmd.stdout, os.O_WRONLY | os.O_CREAT, cmd.umask)
+			cmd.fdout = os.open(cmd.stdout, os.O_WRONLY | os.O_CREAT, 644)
 		except OSError, e:
 			cmd.state = "ERROR opening -> " + e.filename
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			cmd.fdout = None
 		try:
-			cmd.fderr = os.open(cmd.stderr, os.O_WRONLY | os.O_CREAT, cmd.umask)
+			cmd.fderr = os.open(cmd.stderr, os.O_WRONLY | os.O_CREAT, 644)
 		except OSError, e:
 			cmd.state = "ERROR opening -> " + e.filename
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			cmd.fderr = None
+		os.umask(oldmask)
 
 	#CHECK_PATH
 	curr_cmd = cmd.path.split()[0]
 	if (curr_cmd[0] == '.' or curr_cmd[0] == '/'):
 		if os.access(curr_cmd, os.X_OK) == False:
-			cmd.state = "ERROR -> command"
+			cmd.state =  task_lib.color_string("RED", "ERROR -> command")
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 	else:
 		find = False
@@ -60,24 +62,25 @@ def	post_init(cmd):
 				find = True
 				break
 		if (find == False):
-			cmd.state = "ERROR -> command"
+			cmd.state =  task_lib.color_string("RED", "ERROR -> command")
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 
 
 def special_params(cmd, params, name):
 	if (name == "autorestart"):
-		if ((type(params[name]) is int and params[name] < 0) or params[name] != "unexpected"):
-			cmd.state = "ERROR -> " + name
+		if ((type(params[name]) is not bool) and params[name] != "unexpected"):
+			cmd.state = task_lib.color_string("RED", "ERROR -> " + name)
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			return (False)
+		return (params[name])
 	elif (name == "exitcodes"):
 		if (type(params[name]) is not list):
-			cmd.state = "ERROR -> " + name
+			cmd.state = task_lib.color_string("RED", "ERROR -> " + name)
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			return (False)
 		for exit in params[name]:
 			if ((type(exit) is int and exit < 0) or type(exit) is not int):
-				cmd.state = "ERROR -> " + name
+				cmd.state = task_lib.color_string("RED", "ERROR -> " + name)
 				task_lib.log.warning(cmd.id + ': ' + cmd.state)
 				return (False)
 	return (True)
@@ -105,7 +108,6 @@ def check_validity(cmd, params, name):
 			task_lib.log.warning(cmd.id + ': ' + cmd.state)
 			return (False)
 	elif (type(params[name]) is not type_define[name]):
-		print type(params[name])
 		cmd.state = "ERROR -> " + name
 		task_lib.log.warning(cmd.id + ': ' + cmd.state)
 		return (False)
