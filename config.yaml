@@ -1,6 +1,7 @@
 programs:
 
     empty:
+      cmd: ls
 
     fail:
       cmd: "/bin"

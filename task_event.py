@@ -94,7 +94,7 @@ class task_event:
 			if (find == False): print ("task: no process running found -> check status")
 		else:
 			curr = task_lib.check_process(self.cmd, line)
-			if (curr != None and cmd.status != "STOPPING"):
+			if (curr != None and self.status != "STOPPING"):
 				curr.stop()
 				curr.show_status()
 				curr.time = 0

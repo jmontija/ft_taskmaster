@@ -26,7 +26,7 @@ class cmd_event:
 		self.id = key
 		self.status = "WAITING"
 		self.state = "OK"
-		self.path = in_config(self, params, "cmd") or "/ERROR"
+		self.path = in_config(self, params, "cmd") or task_lib.color_string("RED","Empty")
 		self.workingdir = in_config(self, params, "workingdir") or "/tmp"
 		self.numprocs = in_config(self, params, "numprocs") or 1 #0
 		self.stdout = in_config(self, params, "stdout") or "/tmp/task_STDOUT"
@@ -34,7 +34,7 @@ class cmd_event:
 		self.stderr = in_config(self, params, "stderr") or "/tmp/task_STDERR"
 		self.fderr = None
 		self.autostart = in_config(self, params, "autostart") or False
-		self.autorestart = in_config(self, params, "autorestart") or "unexpected"
+		self.autorestart = in_config(self, params, "autorestart") or task_lib.color_string("RED","unexpected")
 		self.exit = in_config(self, params, "exitcodes") or [0, 2]
 		self.starttime = in_config(self, params, "starttime") or 1
 		self.start_timer = -1
@@ -111,13 +111,13 @@ class cmd_event:
 					self.status = "FATAL"
 				else:
 					self.status = "FAILED"
-					self.state = "ERROR processus: check: /tmp/logger.task"
+					self.state = task_lib.color_string("RED", "ERROR processus: check: /tmp/logger.task")
 					task_lib.log.warning(self.id + ': ' + e.strerror)
-				self.start_fail +=1
+				self.start_fail += 1
 		else:
 			self.status = "FATAL"
 
-	def stop(self):	
+	def stop(self):
 		self.process.send_signal(self.stop_signal)
 		self.start_timer = -1
 		self.start_fail = 0
