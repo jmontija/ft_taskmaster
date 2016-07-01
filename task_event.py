@@ -12,6 +12,7 @@
 
 import sys
 import task_lib
+import sys
 from cmd_event import cmd_event
 
 class task_event:
@@ -19,7 +20,11 @@ class task_event:
 	def __init__(self): ####
 		self.cmd = {}
 		try:
+<<<<<<< HEAD
 			data = task_lib.load_conf(sys.argv[1])
+=======
+			data = task_lib.load_conf(str(sys.argv[1]))
+>>>>>>> b4c658d83908d57b69b2da8d3f42dd280bde6fe2
 			cmd = data.get("programs")
 			for k, v in cmd.iteritems():
 				i = 1
@@ -64,36 +69,42 @@ class task_event:
 
 	def	restart(self, line):
 		if (str(line) == "all"):
+			find = False
 			for k, v in self.cmd.iteritems():
 				cmd = self.cmd[k]
 				if (cmd.process != None): ####
+					find = True
 					cmd.restart()
 					cmd.show_status()
+			if (find == False): print ("task: no process running found -> check status " + line)
 		else:
 			curr = task_lib.check_process(self.cmd, line)
 			if (curr != None):
 				curr.restart()
 				curr.show_status()
 			else:
-				print ("task: no process running found -> check status" + line)
-				task_lib.log.info("restart: no process running found -> check status" + line)
+				print ("task: no process running found -> check status")
+				task_lib.log.info("restart: no process running found -> check status " + line)
 
 	def	stop(self, line):
 		if (str(line) == "all"):
+			find = False
 			for k, v in self.cmd.iteritems():
 				cmd = self.cmd[k]
-				if (cmd.process != None): ####
+				if (cmd.process != None and cmd.status != "STOPPING"): ####
+					find = True
 					cmd.stop()
 					cmd.show_status()
 					cmd.time = 0
+			if (find == False): print ("task: no process running found -> check status")
 		else:
 			curr = task_lib.check_process(self.cmd, line)
-			if (curr != None):
+			if (curr != None and self.status != "STOPPING"):
 				curr.stop()
 				curr.show_status()
 				curr.time = 0
 			else:
-				print ("task: no process running found -> check status" + line)
+				print ("task: no process running found -> check status " + line)
 				task_lib.log.info("task: no process running found -> check status" + line)
 
 	def info(self, line):
@@ -101,7 +112,7 @@ class task_event:
 			for k, v in self.cmd.iteritems():
 				cmd = self.cmd[k]
 				if (cmd.id == str(line)):
-					task_lib.print_all_info(cmd, line)
+					cmd.print_all_info(line)
 					task_lib.log.info(cmd.id + ': info has been printed: status:' + cmd.status)
 					break
 		else:

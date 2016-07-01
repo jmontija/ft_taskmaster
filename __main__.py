@@ -22,7 +22,7 @@ def opening():
         fd.close()
     except:
         print ("opening failed___\n\n")
-    log.info("TASK_MASTER LAUNCH:")
+    log.info("TASK_MASTER START:")
 
 
 class keyboard(cmd.Cmd):

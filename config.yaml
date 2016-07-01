@@ -1,7 +1,11 @@
 programs:
 
     empty:
+<<<<<<< HEAD
       cmd: "pwd"
+=======
+      cmd: ls
+>>>>>>> b4c658d83908d57b69b2da8d3f42dd280bde6fe2
 
     fail:
       cmd: "/bin/ls -R /Application"
@@ -37,8 +41,13 @@ programs:
       numprocs: 3
       umask: 022
       workingdir: "/tmp"
+<<<<<<< HEAD
       autostart: False
       autorestart: "unexpected"
+=======
+      autostart: true
+      autorestart: true
+>>>>>>> b4c658d83908d57b69b2da8d3f42dd280bde6fe2
       exitcodes:
         - 0
         - 2
@@ -51,9 +60,15 @@ programs:
 
     wc:
       cmd: "/usr/bin/wc"
+<<<<<<< HEAD
       numprocs: 1
       umask: 022
       autostart: false
+=======
+      numprocs: 0
+      umask: 077
+      autorestart: "djkdd"
+>>>>>>> b4c658d83908d57b69b2da8d3f42dd280bde6fe2
       exitcodes:
         - 0
         - 15

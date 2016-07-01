@@ -5,6 +5,7 @@ Modif de cmd_event -> start  c'etait mal tourné
 Modif des cas derreurs du fichier de config
 Stopped all process quand QUIT
 Signaux rajouter
+Ajout Argument pour fichier de config
 
 pour info "command" : stdout/stderr affiche None si stdout/stderr n'est pas redirigé vers le pipe . cest dans la doc
 
