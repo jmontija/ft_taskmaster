@@ -1,7 +1,6 @@
 programs:
 
     empty:
-      cmd: "dffsd"
 
     fail:
       cmd: "/bin/ls -R /Application"
