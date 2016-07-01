@@ -15,7 +15,7 @@ programs:
 
     cat:
       cmd: "/bin/cat"
-      numprocs: 5
+      numprocs: 1000
       umask: 077
       workingdir: "/tmp"
       autostart: false
