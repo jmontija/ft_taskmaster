@@ -1,0 +1,12 @@
+Precision line_format -> 28 au lieu de 27 detail !
+logging un peu partout
+Modif de task_event __init__ c'etait mal protege
+Modif de cmd_event -> start  c'etait mal tourné
+Modif des cas derreurs du fichier de config
+Stopped all process quand QUIT
+Signaux rajouter
+
+pour info "command" : stdout/stderr affiche None si stdout/stderr n'est pas redirigé vers le pipe . cest dans la doc
+
+modif un peu partout check les ####
+TOUT marche propre normalement, prend mes fichiers pour tester
