@@ -11,6 +11,8 @@
 # **************************************************************************** #
 import signal
 import cmd
+import os
+import subprocess
 from task_lib import task
 from task_lib import close_fd
 from task_lib import log
@@ -45,6 +47,14 @@ class keyboard(cmd.Cmd):
             task.stop(line)
         else:
             print("task: need name to stop")
+
+    def do_shell(self, line):
+        proc = subprocess.Popen(
+                line,
+                shell = True,
+                env = os.environ
+        )
+        proc.wait()
 
     def do_restart(self, line):
         task.restart(line)
